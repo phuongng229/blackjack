@@ -9,7 +9,7 @@ package blackjack_project2_group40;
  * @author jonathan & phuong
  */
 public enum Action {
-    HIT("Hit"), STAND("Stand"), QUIT("Quit"); // Could also SPLIT("Split") or DOUBLE_DOWN("Double Down")
+    HIT("Hit"), STAND("Stand"), QUIT("Quit"), DOUBLE_DOWN("Double Down");
     private final String label;
 
     Action(String label) {

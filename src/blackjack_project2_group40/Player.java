@@ -157,8 +157,7 @@ public class Player extends Person implements Bettor {
         availableActions = new ArrayList<>();
         if (getHandResults().canHit) availableActions.add(Action.HIT);
         if (getHandResults().canStand) availableActions.add(Action.STAND);
-        /*if (handResults.canSplit) availableActions.add(Action.SPLIT);
-        if (handResults.canDoubleDown) availableActions.add(Action.DOUBLE_DOWN);*/
+        if (getHandResults().canDoubleDown) availableActions.add(Action.DOUBLE_DOWN);
     }
     
     private Action promptForAction() {
@@ -192,23 +191,34 @@ public class Player extends Person implements Bettor {
         switch (action) {
             case HIT -> hit();
             case STAND -> stand();
-            /*case SPLIT -> split();
-            case DOUBLE_DOWN -> doubleDown();*/
+            case DOUBLE_DOWN -> doubleDown();
         }
         setLastAction(action);   
     }
     
-    private void hit() {
+    // Used by hit and double down methods to draw a card, print hand details, update hand results and let the user know if they're bust. 
+    private void drawAndProcessCard(String format) {
         Card drawCard = getDeck().drawCard();
         getHand().addCard(drawCard);
-        System.out.println("You hit and draw the [" + drawCard + "].");
+        
+        System.out.println(String.format(format, drawCard));
         printHandDetails();
-        
-        updateHandResults(); //Update if isBust()
-        
+        updateHandResults();
+
         if (isBust()) {
             System.out.println("You are bust!");
         }
+    }
+    
+    private void hit() {
+        drawAndProcessCard("You hit and draw the [%s].");
+    }
+    
+    private void doubleDown() {
+        double bet = currentBet * 2;
+        placeBet(bet);
+        System.out.println("You double down and increase your bet to $" + bet + ". Remaining balance: $" + getBalance());
+        drawAndProcessCard("You draw the [%s].");
     }
     
     private void stand() {

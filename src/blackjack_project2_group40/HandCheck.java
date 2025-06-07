@@ -14,6 +14,5 @@ public class HandCheck {
     public boolean isBust;
     public boolean canHit;
     public boolean canStand;
-    public boolean canSplit;
     public boolean canDoubleDown;
 }

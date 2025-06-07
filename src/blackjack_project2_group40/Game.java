@@ -146,7 +146,7 @@ public class Game {
             }
         }
         
-        while (true) { // Currently loops forever, playing a new round each time
+        while (true) {
             currentRound++;
             System.out.println("------------------------------------------------------------------------");
             System.out.println("Round " + currentRound + "...");
