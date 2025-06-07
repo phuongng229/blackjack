@@ -61,8 +61,8 @@ public class Player extends Person implements Bettor {
             throw new IllegalArgumentException("Insufficient balance for the bet.");
         }
     }
-
-    public void promptForBet() {
+    
+    public void promptForBet() { 
         while (true) {
             System.out.println("------------------------------------------------------------------------");
             System.out.println(getName() + ", your current balance is: $" + balance);
@@ -71,9 +71,9 @@ public class Player extends Person implements Bettor {
             String input = scan.nextLine().trim();
             try {
                 double bet = Double.parseDouble(input);
-                if (bet < MIN_BET || bet > MAX_BET) {
+                if (betExceedsRange(bet)) {
                     System.out.println("Bet must be between $" + MIN_BET + " and $" + MAX_BET);
-                } else if (bet > balance) {
+                } else if (betExceedsBalance(bet)) {
                     System.out.println("Insufficient balance. Enter a lower amount.");
                 } else {
                     placeBet(bet);
@@ -84,6 +84,18 @@ public class Player extends Person implements Bettor {
                 System.out.println("Please enter a valid number");
             }
         }
+    }
+    
+    public boolean betExceedsRange(double bet) {
+        return bet < MIN_BET || bet > MAX_BET;
+    }
+    
+    public boolean betExceedsBalance(double bet) {
+        return bet > balance;
+    }
+    
+    public boolean isValidBet(double bet) {
+        return !betExceedsRange(bet) && !betExceedsBalance(bet);
     }
     
     @Override
@@ -118,7 +130,7 @@ public class Player extends Person implements Bettor {
         }
         
         resetLastAction(); //Using method from Person
-//        promptForBet();
+        //promptForBet();
         
         System.out.println(getName() + ", it's your turn!");
         printHandDetails();
@@ -157,7 +169,8 @@ public class Player extends Person implements Bettor {
         availableActions = new ArrayList<>();
         if (getHandResults().canHit) availableActions.add(Action.HIT);
         if (getHandResults().canStand) availableActions.add(Action.STAND);
-        if (getHandResults().canDoubleDown) availableActions.add(Action.DOUBLE_DOWN);
+        //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
+        if (getHandResults().canDoubleDown && isValidBet(currentBet*2)) availableActions.add(Action.DOUBLE_DOWN);
     }
     
     private Action promptForAction() {
