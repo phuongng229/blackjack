@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * Loading player scores from a text file, saving player scores back to the file
@@ -88,28 +87,18 @@ public class ScoreStore {
     }
 
     //Confirm returning player and handle duplicate name
-    public static PlayerScores confirmExistingPlayer(String name, Scanner scan) {
+    public static PlayerScores getPlayerScores(String name) {
         loadScores();
-
         if (scoreInMap.containsKey(name)) {
-            PlayerScores currentScores = scoreInMap.get(name);
-            System.out.println("Welcome back " + name + ". Your current scores are: " + currentScores);
-            
-            while (true) {
-                System.out.println("Is that your record? (Answer yes/no): ");
-                String answer = scan.nextLine().trim();
-                
-                if (answer.equalsIgnoreCase("yes")) {
-                    return currentScores;
-                } else if (answer.equalsIgnoreCase("no")) {
-                    return null;
-                } else {
-                    System.out.println("Invalid input. Please type 'yes' or 'no'.");
-                }
-            }
+            return scoreInMap.get(name);
         }
-
-        return new PlayerScores(); //Create new scores
+        return new PlayerScores();
+    }
+    
+    // Used by the Game class so GameController can tell GameGUI to display "is this you?" prompt
+    public static boolean playerHasExistingScores(String name) {
+        loadScores();
+        return scoreInMap.containsKey(name);
     }
 
 }

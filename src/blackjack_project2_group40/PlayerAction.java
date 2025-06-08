@@ -8,11 +8,11 @@ package blackjack_project2_group40;
  *
  * @author jonathan & phuong
  */
-public enum Action {
+public enum PlayerAction {
     HIT("Hit"), STAND("Stand"), QUIT("Quit"), DOUBLE_DOWN("Double Down");
     private final String label;
 
-    Action(String label) {
+    PlayerAction(String label) {
         this.label = label;
     }
 

@@ -15,7 +15,80 @@ import java.util.Scanner;
  * @author jonathan & phuong
  */
 public class Game {
+    private final Deck mainDeck = Deck.createFullDeck();
+    private final Deck discardDeck = new Deck();
+    private final List<Person> personList;
+    //private final Dealer dealer;
+    private int currentRound = 0;
+    
+    private final Scanner scan; // TO BE REMOVED
 
+    public Game() {
+        personList = new ArrayList<>();
+        
+        scan = new Scanner(System.in); // TO BE REMOVED
+    }
+    
+    public void addPlayer(String name, PlayerScores scores) {
+        personList.add(new Player(mainDeck, name, scores));
+    }
+    
+    public boolean playerNameTaken(String name) {
+        for (Person p : personList) {
+            if (p.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean playerHasExistingScores(String name) {
+        return ScoreStore.playerHasExistingScores(name);
+    }
+
+    public PlayerScores getPlayerScores(String name) {
+        return ScoreStore.getPlayerScores(name);
+    }
+    
+    public boolean playerCountWithinBounds() {
+        int count = 0;
+        for (Person p : personList) {
+            if (p instanceof Player) {
+                count++;
+            }
+        }
+        return count <= GameRules.MAX_PLAYERS;
+    }
+    
+    
+    
+    /*
+    // Advance from “betting” phase to “deal” phase. 
+    public void dealInitialHands() { ... }
+
+    // Play a single round of player turns. 
+    public void playPlayers() { ... }
+
+    // Let the dealer play. 
+    public void playDealer() { ... }
+
+    // Compute wins/losses, update scores, discard hands. 
+    public void settleBets() { ... }
+
+    // Check deck size and reshuffle from discard if needed. 
+    public void refillDeckIfNeeded() { ... }
+
+    // Snapshot of everything the view needs to render right now. 
+    public GameState getState() { … }
+
+    // What UI buttons/actions are valid right now. 
+    public List<PlayerAction> getAvailableActions() { … }
+
+    // Perform the given action (HIT, STAND, NEXT_ROUND, QUIT). 
+    public String performAction(PlayerAction action) { … }
+    */
+    
+    /*
     private final Scanner scan;
     private static int currentRound;
     private Dealer dealer;
@@ -227,7 +300,7 @@ public class Game {
             person.playTurn();
 
             //Remove if they chose to stand, quite or are bust
-            if (person.isBust() || person.getLastAction() == Action.STAND || person.getLastAction() == Action.QUIT) {
+            if (person.isBust() || person.getLastAction() == PlayerAction.STAND || person.getLastAction() == PlayerAction.QUIT) {
                 iterator.remove();
             }
         }
@@ -248,7 +321,7 @@ public class Game {
         System.out.println(dealer.getHand() + ". Total value: " + dealer.getHand().getTotalValue());
         
         for (Person person : personList) {
-            if (person instanceof Dealer || person.getLastAction() == Action.QUIT || !((Player) person).isActive()) {
+            if (person instanceof Dealer || person.getLastAction() == PlayerAction.QUIT || !((Player) person).isActive()) {
                 continue;
             }
 
@@ -292,5 +365,6 @@ public class Game {
             mainDeck.reloadDeck(discardDeck);
         }
     }
+    */
 
 }

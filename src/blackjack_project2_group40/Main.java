@@ -4,16 +4,18 @@
  */
 package blackjack_project2_group40;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author phuong & jonathan
  */
 public class Main {
-    
     public static void main(String[] args) {
-        
-        Game blackjack = new Game();
-        blackjack.play();
+        SwingUtilities.invokeLater(() -> {
+            Game model = new Game(); // Instantiate the game model
+            GameGUI view = new GameGUI(); // Instantiate the view; its constructor builds all the JFrames, JPanels, etc.
+            new GameController(model, view); // Wire them together via controller
+        });
     }
-    
 }

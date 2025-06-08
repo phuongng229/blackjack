@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class Player extends Person implements Bettor {
     private final Scanner scan = new Scanner(System.in);
-    private List<Action> availableActions;
+    private List<PlayerAction> availableActions;
     private boolean isActive;
     private double balance;
     private static final double INITIAL_BALANCE = 2000;
@@ -138,23 +138,23 @@ public class Player extends Person implements Bettor {
         //Check if player got Blackjack
         if (getHand().getTotalValue() == 21 && getHand().getSize() == 2) {
             System.out.println(getName() + " has Blackjack!");
-            setLastAction(Action.STAND);
+            setLastAction(PlayerAction.STAND);
             return;
         } 
         
         updateHandResults(); //Update handResults BEFORE entering the loop
         
         //Loop to let users choose their action and update the Hand Result
-        while (getLastAction() != Action.STAND && !isBust()) {
+        while (getLastAction() != PlayerAction.STAND && !isBust()) {
             updateAvailableAction();
-            Action action = promptForAction();
+            PlayerAction action = promptForAction();
             performAction(action);
             updateHandResults();
             
             //If player hits 21 total from multiple Hit, stop automatically
             if (getHand().getTotalValue() == 21) {
                 System.out.println("You reached 21!");
-                setLastAction(Action.STAND);
+                setLastAction(PlayerAction.STAND);
                 break;
             }
         } 
@@ -167,13 +167,13 @@ public class Player extends Person implements Bettor {
     
     private void updateAvailableAction() {
         availableActions = new ArrayList<>();
-        if (getHandResults().canHit) availableActions.add(Action.HIT);
-        if (getHandResults().canStand) availableActions.add(Action.STAND);
+        if (getHandResults().canHit) availableActions.add(PlayerAction.HIT);
+        if (getHandResults().canStand) availableActions.add(PlayerAction.STAND);
         //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
-        if (getHandResults().canDoubleDown && isValidBet(currentBet*2)) availableActions.add(Action.DOUBLE_DOWN);
+        if (getHandResults().canDoubleDown && isValidBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
     }
     
-    private Action promptForAction() {
+    private PlayerAction promptForAction() {
         while (true) {
             //Asking users to choose available actions
             System.out.println("Would you like to: ");
@@ -199,7 +199,7 @@ public class Player extends Person implements Bettor {
         }
     }
     
-    private void performAction(Action action) {
+    private void performAction(PlayerAction action) {
         
         switch (action) {
             case HIT -> hit();

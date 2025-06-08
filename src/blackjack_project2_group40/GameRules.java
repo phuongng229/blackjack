@@ -9,6 +9,8 @@ package blackjack_project2_group40;
  * @author jonathan & phuong
  */
 public class GameRules {
+    // Constants
+    public static final int MAX_PLAYERS = 7;
     
     //Checks properties of the player's hand, returning the results
     public static HandCheck handCheck(Hand hand) {

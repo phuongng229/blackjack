@@ -15,7 +15,7 @@ public abstract class Person {
     private final Deck deck;
     private HandCheck handResults;
     private PlayerScores scores;
-    private Action lastAction;
+    private PlayerAction lastAction;
 
     public Person(Deck deck, String name) {
         this.deck = deck;
@@ -44,11 +44,11 @@ public abstract class Person {
         this.scores = scores;
     }
 
-    public Action getLastAction() {
+    public PlayerAction getLastAction() {
         return lastAction;
     }
     
-    public void setLastAction(Action lastAction) {
+    public void setLastAction(PlayerAction lastAction) {
         this.lastAction = lastAction;
     }
    
