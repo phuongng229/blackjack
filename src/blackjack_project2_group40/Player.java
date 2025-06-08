@@ -170,7 +170,7 @@ public class Player extends Person implements Bettor {
         if (getHandResults().canHit) availableActions.add(Action.HIT);
         if (getHandResults().canStand) availableActions.add(Action.STAND);
         //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
-        if (getHandResults().canDoubleDown && isValidBet(currentBet*2)) availableActions.add(Action.DOUBLE_DOWN);
+        if (getHandResults().canDoubleDown && balance >= currentBet) availableActions.add(Action.DOUBLE_DOWN);
     }
     
     private Action promptForAction() {
@@ -235,10 +235,6 @@ public class Player extends Person implements Bettor {
             drawAndProcessCard("You draw the [%s].");
             setLastAction(Action.STAND);
         }
-//        double bet = currentBet * 2;
-//        placeBet(bet);
-//        System.out.println("You double down and increase your bet to $" + bet + ". Remaining balance: $" + getBalance());
-//        drawAndProcessCard("You draw the [%s].");
     }
     
     private void stand() {
