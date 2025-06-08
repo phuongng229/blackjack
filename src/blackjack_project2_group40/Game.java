@@ -140,16 +140,23 @@ public class Game {
 
     //Game loop
     private void doGameLoop() {
-        for (Person person : personList) {
-            if (person instanceof Player player && player.isActive()) {
-                player.promptForBet();
-            }
-        }
+//        for (Person person : personList) {
+//            if (person instanceof Player player && player.isActive()) {
+//                player.promptForBet();
+//            }
+//        }
         
         while (true) {
             currentRound++;
             System.out.println("------------------------------------------------------------------------");
             System.out.println("Round " + currentRound + "...");
+            
+            for (Person person : personList) {
+            if (person instanceof Player player && player.isActive()) {
+                player.promptForBet();
+            }
+        }
+            
             checkDeck();
             dealHands();
             playRound();
