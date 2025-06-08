@@ -9,11 +9,10 @@ package blackjack_project2_group40;
  * @author jonathan & phuong
  */
 public abstract class Person {
-
     private final String name;
     private final Hand hand;
     private final Deck deck;
-    private HandCheck handResults;
+    //private HandCheck handResults;
     private PlayerScores scores;
     private PlayerAction lastAction;
 
@@ -23,57 +22,44 @@ public abstract class Person {
         this.hand = new Hand();
         this.scores = new PlayerScores();
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public Hand getHand() {
-        return hand;
-    }
-
-    public Deck getDeck() {
-        return deck;
-    }
-
-    public PlayerScores getScores() {
-        return scores;
+    // Getters
+    public String getName() { return name; }
+    public Hand getHand() { return hand; }
+    public Deck getDeck() { return deck; }
+    public PlayerScores getScores() { return scores; }
+    public PlayerAction getLastAction() { return lastAction; }
+    
+    //Check total value of handResults by using GameRules class
+    public HandCheck getHandResults() {
+        return GameRules.handCheck(hand);
     }
     
-    public void setScores(PlayerScores scores) {
-        this.scores = scores;
-    }
-
-    public PlayerAction getLastAction() {
-        return lastAction;
-    }
+    // Setters
+    public void setScores(PlayerScores scores) { this.scores = scores; }
+    public void setLastAction(PlayerAction lastAction) { this.lastAction = lastAction; }
     
-    public void setLastAction(PlayerAction lastAction) {
-        this.lastAction = lastAction;
-    }
-   
-    //Reset memory of what the player did in the last round
     public void resetLastAction() {
         this.lastAction = null;
     }
-
-    public HandCheck getHandResults() {
-        return handResults;
+    
+    public Card hit() {
+        Card drawCard = getDeck().drawCard();
+        getHand().addCard(drawCard);
+        return drawCard;
     }
-
-    //Check total value of handResults by using class GameRules
-    public void updateHandResults() {
-        this.handResults = GameRules.handCheck(hand);
+    
+    public void stand() {
+        
     }
 
     public boolean isBust() {
-        return handResults != null && handResults.isBust;
+        HandCheck handResults = getHandResults();
+        return handResults.isBust;
     }
 
     public boolean isBlackjack() {
-        return handResults != null && handResults.isBlackjack;
+        HandCheck handResults = getHandResults();
+        return handResults.isBlackjack;
     }
-
-    public abstract void playTurn();
 
 }

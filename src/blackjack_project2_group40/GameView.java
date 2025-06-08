@@ -18,9 +18,10 @@ public interface GameView {
     
     // Player Setup
     void setPlayerSetupHandler(ActionListener listener);
-    void clearPlayerSetup();
+    void updatePlayerCount(int count);
     void clearPlayerNameField();
     String getEnteredPlayerName();
     
+    void setCurrentPlayerName(String name);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
 }

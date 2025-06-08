@@ -17,24 +17,49 @@ import javax.swing.event.DocumentListener;
  */
 public class GameGUI implements GameView {
     private final JFrame frame = new JFrame("Blackjack");
-    private final JTextArea log = new JTextArea(10,30);
-    private final JPanel buttons = new JPanel();
+    // Using card layouts to allow switching between start and game screens without reloading GUI every time.
+    private final CardLayout cardLayout = new CardLayout();
+    private final JPanel mainPanel = new JPanel(cardLayout);
     
-    // Setup Panel
-    private final JPanel setupPanel  = new JPanel();
+    // Panels
+    private final JPanel startPanel = new JPanel();
+    private final JPanel gamePanel = new JPanel(new BorderLayout());
+    
+    //Components for startPanel
+    private final JTextArea log = new JTextArea(10,30);
+    private final JLabel playerCountLabel = new JLabel("Players: 0/"+GameRules.MAX_PLAYERS);
     private final JTextField nameField  = new JTextField(15);
     private final JButton joinButton  = new JButton("Join");
     private final JButton startGameButton  = new JButton("Start Game");
-
+    
+    // Components for gamePanel
+    private final JPanel buttons = new JPanel();
+    private final JLabel currentPlayerName = new JLabel("");
+    
     public GameGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
+        frame.setSize(600, 400);
+        
+        setupStartPanel();
+        setupGamePanel();
+        
+        mainPanel.add(startPanel, "Start");
+        mainPanel.add(gamePanel, "Game");
+
+        frame.setContentPane(mainPanel);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+        
+        
+    private void setupStartPanel() {
+        startPanel.setLayout(new BorderLayout());
         
         // --- Title Label ---
         JLabel titleLabel = new JLabel("Welcome to Blackjack", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 28)); // Make it big and bold
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
-        frame.add(titleLabel, BorderLayout.PAGE_START);
+        startPanel.add(titleLabel, BorderLayout.NORTH);
         
         // --- Center panel (Rules + Log) ---
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -47,8 +72,8 @@ public class GameGUI implements GameView {
             + "- Face cards are worth 10\n"
         );
         JTextArea rulesArea = new JTextArea();
-        rulesArea.setEditable(false);
         rulesArea.setText(rulesText);
+        rulesArea.setEditable(false);
         JScrollPane rulesScroll = new JScrollPane(rulesArea);
         rulesScroll.setBorder(BorderFactory.createTitledBorder("Rules"));
         rulesArea.setOpaque(false);
@@ -60,15 +85,16 @@ public class GameGUI implements GameView {
         log.setWrapStyleWord(true);
         centerPanel.add(new JScrollPane(log));
         
-        frame.add(centerPanel, BorderLayout.CENTER);
+        startPanel.add(centerPanel, BorderLayout.CENTER);
         
-        // --- Setup panel (bottom) ---
-        setupPanel.add(new JLabel("Enter player name:"));
-        setupPanel.add(nameField);
-        setupPanel.add(joinButton);
-        setupPanel.add(startGameButton);
-        frame.add(setupPanel, BorderLayout.SOUTH);
-        
+        // --- Input panel (bottom) ---
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(new JLabel("Enter player name:"));
+        inputPanel.add(nameField);
+        inputPanel.add(joinButton);
+        inputPanel.add(startGameButton);
+        inputPanel.add(playerCountLabel);
+        startGameButton.setEnabled(false);
         joinButton.setEnabled(false); // initially false until text is entered into name field
         nameField.getDocument().addDocumentListener(new DocumentListener() { // Event listener on nameField to toggle joinButton enabled/disabled
             @Override
@@ -82,17 +108,23 @@ public class GameGUI implements GameView {
                 joinButton.setEnabled(!text.isEmpty());
             }
         });
-        // --- Action buttons at bottom (empty for now) ---
-        //frame.add(buttons, BorderLayout.SOUTH);
 
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        startPanel.add(inputPanel, BorderLayout.SOUTH);
+    }
+
+    private void setupGamePanel() {
+        gamePanel.add(buttons, BorderLayout.SOUTH);
+        gamePanel.add(currentPlayerName , BorderLayout.NORTH);
     }
     
-    // --- HELPER FUNCTIONS ---
+    
+    // ---- HELPER FUNCTIONS ----
+    
+    
+    public void showGameScreen() {
+        cardLayout.show(mainPanel, "Game");
+    }
 
-    // --- Messaging ---
     @Override
     public void showMessage(String message) {
         log.append(message + "\n");
@@ -108,11 +140,13 @@ public class GameGUI implements GameView {
         return result == JOptionPane.YES_OPTION;
     }
     
-    // --- Player Setup ---
+    // --- Start Panel ---
     @Override
     public void setPlayerSetupHandler(ActionListener listener) {
         joinButton.setActionCommand("Join"); // to differentiate it from others
         joinButton.addActionListener(listener); // plain and simple
+        startGameButton.setActionCommand("Start");
+        startGameButton.addActionListener(listener);
     }
     @Override
     public String getEnteredPlayerName() {
@@ -123,13 +157,12 @@ public class GameGUI implements GameView {
         nameField.setText("");
     }
     @Override
-    public void clearPlayerSetup() {
-        // Remove that panel once setup is complete
-        frame.remove(setupPanel);
-        frame.revalidate();
-        frame.repaint();
+    public void updatePlayerCount(int count) {
+        playerCountLabel.setText("Players: " + count+"/"+GameRules.MAX_PLAYERS);
+        startGameButton.setEnabled(count > 0);
     }
-    
+
+    // --- Game Panel ---
     @Override
     public void setActionButtons(List<PlayerAction> actions, ActionListener listener) {
         buttons.removeAll();
@@ -141,6 +174,10 @@ public class GameGUI implements GameView {
         }
         buttons.revalidate();
         buttons.repaint();
+    }
+    @Override
+    public void setCurrentPlayerName(String name) {
+        currentPlayerName.setText(name);
     }
 
     private String pretty(PlayerAction act) {

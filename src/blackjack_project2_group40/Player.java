@@ -6,26 +6,23 @@ package blackjack_project2_group40;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  *
  * @author jonathan & phuong
  */
-public class Player extends Person implements Bettor {
-    private final Scanner scan = new Scanner(System.in);
-    private List<PlayerAction> availableActions;
-    private boolean isActive;
+public class Player extends Person implements Bettor {    
     private double balance;
+    private double currentBet;
+    private boolean isActive;
+
     private static final double INITIAL_BALANCE = 2000;
     private static final double MIN_BET = 50;
     private static final double MAX_BET = 300;
-    private double currentBet;
     
     public Player(Deck deck, String name, PlayerScores scores) {
         super(deck, name);
         setScores(scores);
-        this.isActive = true;
         this.balance = INITIAL_BALANCE;
         this.currentBet = 0;
     }
@@ -34,35 +31,75 @@ public class Player extends Person implements Bettor {
     public double getBalance() {
         return balance;
     }
-    
     @Override
     public double getCurrentBet() {
         return currentBet;
     }
-    
     public boolean isActive() {
         return isActive;
     }
-    
     public void setActive(boolean active) {
         this.isActive = active;
     }
     
-    public void quit() {
-        this.isActive = false;
+    public boolean canPlaceBet(double amount) {
+        return amount >= MIN_BET && amount <= MAX_BET && amount <= balance;
     }
     
     @Override
     public void placeBet(double amount) {
-        if (amount <= balance) {
-            currentBet = amount;
-            balance -= amount;
-        } else {
-            throw new IllegalArgumentException("Insufficient balance for the bet.");
+        if (!canPlaceBet(amount)) {
+            throw new IllegalArgumentException("Invalid bet amount.");
         }
+        currentBet = amount;
+        balance -= amount;
     }
     
-    public void promptForBet() { 
+    @Override
+    public void winBet() {
+        balance += currentBet * 2;
+        currentBet = 0;
+    }
+    @Override
+    public void pushBet() {
+        balance += currentBet;
+        currentBet = 0;
+    }
+    @Override
+    public void loseBet() {
+        currentBet = 0;
+    }
+    
+    public boolean betExceedsRange(double bet) {
+        return bet < MIN_BET || bet > MAX_BET;
+    }
+    
+    public boolean betExceedsBalance(double bet) {
+        return bet > balance;
+    }
+    
+    public boolean isValidBet(double bet) {
+        return !betExceedsRange(bet) && !betExceedsBalance(bet);
+    }
+    
+    public List<PlayerAction> getAvailableActions() {
+        List<PlayerAction> availableActions = new ArrayList<>();
+        HandCheck handResults = getHandResults();
+        if (handResults.canHit) availableActions.add(PlayerAction.HIT);
+        if (handResults.canStand) availableActions.add(PlayerAction.STAND);
+        if (handResults.canDoubleDown && isValidBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN); //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
+
+        return availableActions;
+    }
+    
+    public Card doubleDown() {
+        placeBet(currentBet * 2);
+        Card drawCard = getDeck().drawCard();
+        getHand().addCard(drawCard);
+        return drawCard;
+    }
+    
+    /*public void promptForBet() { 
         while (true) {
             System.out.println("------------------------------------------------------------------------");
             System.out.println(getName() + ", your current balance is: $" + balance);
@@ -86,17 +123,7 @@ public class Player extends Person implements Bettor {
         }
     }
     
-    public boolean betExceedsRange(double bet) {
-        return bet < MIN_BET || bet > MAX_BET;
-    }
     
-    public boolean betExceedsBalance(double bet) {
-        return bet > balance;
-    }
-    
-    public boolean isValidBet(double bet) {
-        return !betExceedsRange(bet) && !betExceedsBalance(bet);
-    }
     
     @Override
     public void winBet() {
@@ -199,16 +226,6 @@ public class Player extends Person implements Bettor {
         }
     }
     
-    private void performAction(PlayerAction action) {
-        
-        switch (action) {
-            case HIT -> hit();
-            case STAND -> stand();
-            case DOUBLE_DOWN -> doubleDown();
-        }
-        setLastAction(action);   
-    }
-    
     // Used by hit and double down methods to draw a card, print hand details, update hand results and let the user know if they're bust. 
     private void drawAndProcessCard(String format) {
         Card drawCard = getDeck().drawCard();
@@ -221,20 +238,6 @@ public class Player extends Person implements Bettor {
         if (isBust()) {
             System.out.println("You are bust!");
         }
-    }
+    }*/
     
-    private void hit() {
-        drawAndProcessCard("You hit and draw the [%s].");
-    }
-    
-    private void doubleDown() {
-        double bet = currentBet * 2;
-        placeBet(bet);
-        System.out.println("You double down and increase your bet to $" + bet + ". Remaining balance: $" + getBalance());
-        drawAndProcessCard("You draw the [%s].");
-    }
-    
-    private void stand() {
-        System.out.println("You stand at "+getHand().getTotalValue()+".");
-    }
 }
