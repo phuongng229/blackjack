@@ -201,12 +201,13 @@ public class Player extends Person implements Bettor {
     
     private void performAction(Action action) {
         
-        switch (action) {
-            case HIT -> hit();
-            case STAND -> stand();
-            case DOUBLE_DOWN -> doubleDown();
-        }
-        setLastAction(action);   
+        if (action == Action.DOUBLE_DOWN) {
+            doubleDown();
+        } else {
+            if (action == Action.HIT);
+            else if (action == Action.STAND);
+            setLastAction(action);
+        }  
     }
     
     // Used by hit and double down methods to draw a card, print hand details, update hand results and let the user know if they're bust. 
