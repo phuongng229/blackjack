@@ -228,10 +228,17 @@ public class Player extends Person implements Bettor {
     }
     
     private void doubleDown() {
-        double bet = currentBet * 2;
-        placeBet(bet);
-        System.out.println("You double down and increase your bet to $" + bet + ". Remaining balance: $" + getBalance());
-        drawAndProcessCard("You draw the [%s].");
+        if (balance >= currentBet) {
+            balance -= currentBet;
+            currentBet *= 2;
+            System.out.println("You double down and increase your bet to $" + currentBet + ". Remaining balance: $" + getBalance());
+            drawAndProcessCard("You draw the [%s].");
+            setLastAction(Action.STAND);
+        }
+//        double bet = currentBet * 2;
+//        placeBet(bet);
+//        System.out.println("You double down and increase your bet to $" + bet + ". Remaining balance: $" + getBalance());
+//        drawAndProcessCard("You draw the [%s].");
     }
     
     private void stand() {
