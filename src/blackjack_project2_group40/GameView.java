@@ -10,6 +10,10 @@ import java.util.List;
 /**
  *
  * @author Jonathan
+ * 
+ * Defines the view. It abstracts all GUI details behind a simple interface.
+ * By coding to this interface, the controller remains decoupled from Swing or any specific UI toolkit.
+ * 
  */
 public interface GameView {
     //void displayState(GameState state);

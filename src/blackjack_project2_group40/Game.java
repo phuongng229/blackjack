@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  *
  * @author jonathan & phuong
+ * 
+ * Game class acts as the primary model the GameController interacts with,
+ * it acts as a bridge between GameController and all the other models (e.g. Player), and contains methods for general game logic.
  */
 public class Game {
     public enum Phase { BETTING, PLAYER_TURN, DEALER_TURN, SETTLE };
@@ -23,7 +25,7 @@ public class Game {
     private int playerCount = 0;
     private int currentRound = 0;
     
-    private Phase phase = Phase.PLAYER_TURN;
+    private Phase phase = Phase.PLAYER_TURN; // CHANGE TO BETTING LATER - BETTING PANEL CURRENTLY BROKEN
 
     public Game() {
         personList = new ArrayList<>();
@@ -99,6 +101,7 @@ public class Game {
         return List.of();
     }
     
+    // Runs a single player action depending on input from GameController
     public String performPlayerAction(PlayerAction action) {
         Person person = getCurrentPerson();
         if (person instanceof Player player) {
@@ -137,6 +140,7 @@ public class Game {
         return "";
     }
     
+    // Runs the dealer's turn (different logic from players)
     public String performDealerTurn() {
          System.out.println("Dealer turn!");
         Dealer dealer = (Dealer)getCurrentPerson();
@@ -155,6 +159,8 @@ public class Game {
         return log.toString().trim(); // Returns log to GameController for GUI
     }
     
+    // Moves the game forward to the next step.  If all users have not finished their turn,
+    // it continues to the next user. Otherwise, continue to the next game phase (e.g. SETTLE, BETTING, etc.)
     public void advance() {
         switch (phase) {
             case BETTING -> {
@@ -189,8 +195,9 @@ public class Game {
         }
     }
     
+    // Reset for the next round
     public void startNewRound() {
-        phase = Phase.PLAYER_TURN; // CHANGE TO BETTING LATER
+        phase = Phase.PLAYER_TURN; // CHANGE TO BETTING LATER - BETTING PANEL CURRENTLY BROKEN
         currentPersonIndex = 0;
         currentRound++;
         //checkDeck();
@@ -201,10 +208,11 @@ public class Game {
         //endRound();
     }
     
+    // Deals two cards to each Person's hand
     private void dealHands() {
         for (Person person : personList) {
             person.getHand().clear();
-            for (int i = 0; i < 2; i++) { // Adds two cards to each person's deck
+            for (int i = 0; i < 2; i++) {
                 person.getHand().addCard(mainDeck.drawCard());
             }
         }

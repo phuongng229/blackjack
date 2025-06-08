@@ -11,6 +11,12 @@ import java.util.List;
 /**
  *
  * @author Jonathan
+ * 
+ * GameController class listens for user-driven events from the GameGUI (e.g. button clicks),
+ * calls relevant methods in the model (trying to speak only to the game class to keep the model and view decoupled),
+ * and then updates the GameGUI (view) to reflect the model’s new state
+ * (refreshing buttons, log messages, etc.)
+ * 
  */
 public class GameController implements ActionListener {
     private final Game model;
@@ -27,6 +33,8 @@ public class GameController implements ActionListener {
         //view.setActionButtons(model.getAvailableActions(), this);
     }
 
+    // Recieves ActionListener events and executes functions depending on the command recieved.
+    // Will be triggered if a button is clicked for example, can then call methods within the model to handle game logic.
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand().toUpperCase().replace(" ", "_");
@@ -70,6 +78,7 @@ public class GameController implements ActionListener {
         }
     }
     
+    // Used by the "Join" command to handle players joining
     private void handlePlayerJoin() {
         String name = view.getEnteredPlayerName();
         if (name.isEmpty()) {
@@ -94,12 +103,12 @@ public class GameController implements ActionListener {
         view.updatePlayerCount(model.getPlayerCount());
     }
     
-    private void showNameTakenMessage(String name) {
+    private void showNameTakenMessage(String name) { // Used by the handlePlayerJoin() method
         view.showMessage("Sorry, " + name + " is already taken. Please enter a different name.");
         view.clearPlayerNameField();
     }
     
-    
+    // Refreshes aspects of the GUI when the game state changes. Called multiple times within GameControlelr
     private void refreshView() {
         System.out.print("View Refreshed");
         

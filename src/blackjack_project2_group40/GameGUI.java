@@ -14,6 +14,17 @@ import javax.swing.event.DocumentListener;
 /**
  *
  * @author Jonathan
+ * 
+ * GameGUI class is a Swing implementation of GameView that:
+ * - Builds the JFrame, panels, labels, text fields, buttons, etc.
+ * - Uses CardLayout to swap UI regions for different game states (startPanel, gamePanel)
+ * - Renders log messages to the player log JTextArea.
+ * - Manages enabling/disabling buttons based on input.
+ * - Forwards user actions (button presses) to the controller via ActionListeners.
+ * - etc.
+ * 
+ * UI wiring and layout logic goes here - no game rules or flow control are implemented in this class.
+ * 
  */
 public class GameGUI implements GameView {
     private final JFrame frame = new JFrame("Blackjack");
