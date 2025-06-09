@@ -9,35 +9,41 @@ package blackjack_project2_group40;
  * @author phuong & jonathan
  */
 public enum Face { //Declare enum for card face
-    ACE("Ace", 11),
-    TWO(2),
-    THREE(3),
-    FOUR(4),
-    FIVE(5),
-    SIX(6),
-    SEVEN(7),
-    EIGHT(8),
-    NINE(9),
-    TEN(10),
-    JACK("Jack", 10),
-    QUEEN("Queen", 10),
-    KING("King", 10);
-    
+    ACE  ("Ace", 11, "A"),
+    TWO  (2, "2"),
+    THREE(3, "3"),
+    FOUR (4, "4"),
+    FIVE (5, "5"),
+    SIX  (6, "6"),
+    SEVEN(7, "7"),
+    EIGHT(8, "8"),
+    NINE (9, "9"),
+    TEN  (10, "10"),
+    JACK ("Jack", 10, "J"),
+    QUEEN("Queen",10, "Q"),
+    KING ("King", 10, "K");
+
     private final int value;
     private final String name;
-    
-    Face (String name, int value) {
-        this.name = name;
+    private final String code;
+
+    // full constructor
+    Face(String name, int value, String code) {
+        this.name  = name;
         this.value = value;
+        this.code  = code;
     }
-    
-    Face (int value) {
-        this.name = null;
-        this.value = value;
+
+    Face(int value, String code) {
+        this(null, value, code);
     }
-    
+
     public int getValue() {
-        return this.value;
+        return value;
+    }
+
+    public String getCode() {
+        return code;
     }
     
     @Override

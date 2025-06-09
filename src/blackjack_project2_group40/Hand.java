@@ -6,6 +6,7 @@ package blackjack_project2_group40;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  *
@@ -22,6 +23,10 @@ public class Hand {
     //Get a specific card in cards array
     public Card getCard(int index) {
         return cards.get(index);
+    }
+    
+    public List<Card> getCards() {
+        return Collections.unmodifiableList(cards); // makes it read-only for greater encapsulation
     }
 
     //Discard hand to Deck

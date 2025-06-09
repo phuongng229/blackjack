@@ -17,10 +17,11 @@ public class GameData {
     public int currentRound;
     public Game.Phase currentPhase;
     public int playerCount;
+    public Hand dealerHand;
     
     // Current Person Data
-    public String currentPersonName;
     public Hand currentPersonHand;
+    public String currentPersonName;
     public List<PlayerAction> currentPersonAvailableActions;
     public double currentPersonBalance;
     public double currentPersonBet;

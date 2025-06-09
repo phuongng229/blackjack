@@ -29,7 +29,7 @@ public class GameController implements ActionListener {
     }
 
     private void init() {
-        view.setPlayerSetupHandler(this);
+        view.setGameHandler(this);
         //view.setActionButtons(model.getAvailableActions(), this);
     }
 
@@ -48,10 +48,14 @@ public class GameController implements ActionListener {
             }
             case "START" -> {
                 view.showMessage("Game starting!");
-                ((GameGUI) view).showGameScreen();
+                view.showGameScreen();
                 model.setupDealer();
                 model.startNewRound();
                 refreshView();
+                return;
+            }
+            case "HOME" -> {
+                view.showStartScreen();
                 return;
             }
             case "NEXT_ROUND" -> {
@@ -61,8 +65,6 @@ public class GameController implements ActionListener {
             }
             case "PLACE_BET" -> {
                 handleBetPlaced();
-                model.advance();
-                refreshView();
                 return;
             }
             case "HIT", "DOUBLE_DOWN", "STAND", "QUIT" -> {
@@ -119,11 +121,14 @@ public class GameController implements ActionListener {
             return;
         }
         if (model.betExceedsRange(bet)) {
+            System.out.println("Bet EXCEEDS!");
             view.showMessage(data.currentPersonName + ": Your bet does not fall within the allowed amount.");
             return;
         }
         model.placeBet(bet);
         view.clearBetAmountField();
+        model.advance();
+        refreshView();
     }
     
     
@@ -134,7 +139,6 @@ public class GameController implements ActionListener {
         GameData data = model.getCurrentGameData();
         
         // Update GUI with GameData
-        view.setCurrentPersonName(data.currentPersonName);
         view.setCurrentPersonBalance(data.currentPersonBalance);
         view.setCurrentPersonBet(data.currentPersonBet);
         view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
@@ -147,6 +151,8 @@ public class GameController implements ActionListener {
             case PLAYER_TURN -> {
                 view.setActionTitle(data.currentPersonName + ", would you like to?");
                 view.showBetInput(false);
+                view.displayPlayerHand(data.currentPersonHand.getCards());
+                view.displayDealerHand(data.dealerHand.getCards());
             }
             case DEALER_TURN -> {
                 view.setActionTitle("It's the dealer's turn");

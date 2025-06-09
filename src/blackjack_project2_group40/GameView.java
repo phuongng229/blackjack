@@ -16,9 +16,12 @@ import java.util.List;
  * 
  */
 public interface GameView {
-    //void displayState(GameState state);
+    void showStartScreen();
+    void showGameScreen();
+            
     void showMessage(String message);
     boolean promptYesNo(String message);
+    void setGameHandler(ActionListener listener);
     
     // Input Fields
     String getEnteredPlayerName();
@@ -27,16 +30,17 @@ public interface GameView {
     void clearBetAmountField();
 
     // Player Setup
-    void setPlayerSetupHandler(ActionListener listener);
     void updatePlayerCount(int count);
 
     // Game Phase
-    void setCurrentPersonName(String name);
     void setCurrentPersonBalance(double balance);
     void setCurrentPersonBet(double bet);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
     
     void showBetInput(boolean visible);
+    
+    void displayPlayerHand(List<Card> cards);
+    void displayDealerHand(List<Card> cards);
     
 }

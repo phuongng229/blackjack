@@ -9,20 +9,26 @@ package blackjack_project2_group40;
  * @author jonathan & phuong
  */
 public enum Suit {
-    CLUBS("Clubs"),
-    DIAMONDS("Diamonds"),
-    HEARTS("Hearts"),
-    SPADES("Spades");
+    CLUBS   ("Clubs", "C"),
+    DIAMONDS("Diamonds", "D"),
+    HEARTS  ("Hearts", "H"),
+    SPADES  ("Spades", "S");
     
-    private final String suit;
-    
-    Suit(String suit) {
-        this.suit = suit;
+    private final String name;
+    private final String code;
+
+    Suit(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
     }
     
     @Override
     public String toString() {
-        return suit;
+        return name;
     }
     
 }

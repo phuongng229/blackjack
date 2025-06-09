@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.text.NumberFormatter;
 
 /**
@@ -44,21 +46,26 @@ public class GameGUI implements GameView {
     private final JTextField nameField  = new JTextField(15);
     private final JButton joinButton  = new JButton("Join");
     private final JButton startGameButton  = new JButton("Start Game");
+    private final JButton homeButton  = new JButton("Home");
     
     // Components for gamePanel
     private final JFormattedTextField betField;
     private final JLabel betFieldLabel = new JLabel("Amount: $");
     private final JPanel buttons = new JPanel();
-    private final JLabel currentPersonName = new JLabel("");
     private final JLabel currentPersonBalance = new JLabel();
     private final JLabel currentPersonBet = new JLabel();
     private final JLabel actionTitle = new JLabel("Would you like to?");
     
+    private final Map<String, ImageIcon> cardIconMap = new HashMap<>();
+    private final JPanel playerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+    private final JPanel dealerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+    
     public GameGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);        
+        frame.setSize(600, 400);      
         
-        // Uses formatter to create betField in currency format
+        // Uses formatter to create betField in currency format, suggested by ChatGPT
+        // Needs to be in constructor as betField is final
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setGroupingUsed(false);
@@ -69,6 +76,7 @@ public class GameGUI implements GameView {
         betField = new JFormattedTextField(formatter);
         betField.setColumns(6);
         
+        loadCardIcons();
         setupStartPanel();
         setupGamePanel();
         
@@ -79,15 +87,29 @@ public class GameGUI implements GameView {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-        
-        
+    
+    private void loadCardIcons() {
+        for (Suit suit : Suit.values()) {
+            for (Face face : Face.values()) {
+                String code = face.getCode() +"-"+ suit.getCode();  // e.g. "A-S"
+                String path = "/images/cards/" + code + ".png";
+                java.net.URL imgURL = getClass().getResource(path);
+                if (imgURL != null) {
+                    cardIconMap.put(code, new ImageIcon(imgURL));
+                } else {
+                    System.err.println("Missing image: " + path);
+                }
+            }
+        }
+    }
+    
     private void setupStartPanel() {
         startPanel.setLayout(new BorderLayout());
         
         // --- Title Label ---
         JLabel titleLabel = new JLabel("Welcome to Blackjack", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // adds padding
         startPanel.add(titleLabel, BorderLayout.NORTH);
         
         // --- Center panel (Rules + Log) ---
@@ -143,10 +165,35 @@ public class GameGUI implements GameView {
 
     private void setupGamePanel() {
         JPanel detailsPanel = new JPanel();
-        detailsPanel.add(currentPersonName);
         detailsPanel.add(currentPersonBalance);
         detailsPanel.add(currentPersonBet);
-        gamePanel.add(detailsPanel, BorderLayout.NORTH);
+        
+        
+        // Load the background image for the handsWrapper
+        ImageIcon handsBgIcon = new ImageIcon(getClass().getResource("/images/background.jpg"));
+        Image handsBg = handsBgIcon.getImage();
+
+        // Create the background panel with no forced layout
+        JPanel handsWrapper = new ImageBackgroundPanel(handsBg, null);
+
+        // Set the layout you want to use (preserving original layout)
+        handsWrapper.setLayout(new BoxLayout(handsWrapper, BoxLayout.Y_AXIS));
+        handsWrapper.setOpaque(false);
+        dealerHandPanel.setOpaque(false);
+        playerHandPanel.setOpaque(false);
+
+        
+        // Dealer’s hand at top
+        JLabel dealerLabel = new JLabel("Dealer’s Hand");
+        handsWrapper.add(dealerLabel);
+        handsWrapper.add(dealerHandPanel);
+        
+        // Player’s hand below
+        JLabel playerLabel = new JLabel("Your Hand");
+        handsWrapper.add(playerLabel);
+        handsWrapper.add(playerHandPanel);
+        
+        gamePanel.add(handsWrapper, BorderLayout.CENTER);
         
         // --- Input panel (bottom) ---
         JPanel southPanel = new JPanel(new BorderLayout(0, 8)); // hgap=0px, vgap=8px (between NORTH and CENTER)
@@ -155,21 +202,80 @@ public class GameGUI implements GameView {
         actionTitle.setHorizontalAlignment(SwingConstants.CENTER);
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
         
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(betFieldLabel);
-        inputPanel.add(betField);
-        inputPanel.add(buttons);
+        // --- Input Panel ---
+        //JPanel inputPanel = new JPanel(new BorderLayout());
+        JPanel inputPanelLeft = new JPanel();
+        JPanel inputPanelCenter = new JPanel();
+        JPanel inputPanelRight = new JPanel();
         
-        southPanel.add(actionTitle, BorderLayout.NORTH);
-        southPanel.add(inputPanel, BorderLayout.CENTER);
+        inputPanelLeft.add(homeButton);
+        inputPanelCenter.add(betFieldLabel);
+        inputPanelCenter.add(betField);
+        inputPanelCenter.add(buttons);
+        
+        JPanel inputPanel = buildInputPanel(inputPanelLeft, inputPanelCenter, inputPanelRight);
+        
+        dealerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dealerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        southPanel.add(detailsPanel, BorderLayout.NORTH);
+        southPanel.add(actionTitle, BorderLayout.CENTER);
+        southPanel.add(inputPanel, BorderLayout.SOUTH);
+        
         gamePanel.add(southPanel, BorderLayout.SOUTH);
+        
+        
+        
+        
+        
+        
+        
+    }
+    
+    private JPanel buildInputPanel(JComponent leftComponent, JComponent centerComponent, JComponent rightComponent) {
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        // LEFT WRAPPER
+        JPanel leftWrapper = new JPanel(new BorderLayout());
+        leftWrapper.add(leftComponent, BorderLayout.CENTER);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.NONE;
+        inputPanel.add(leftWrapper, gbc);
+
+        // CENTER
+        gbc.gridx = 1;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        inputPanel.add(centerComponent, gbc);
+
+        // RIGHT WRAPPER
+        JPanel rightWrapper = new JPanel(new BorderLayout());
+        rightWrapper.add(rightComponent, BorderLayout.CENTER);
+        gbc.gridx = 2;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.fill = GridBagConstraints.NONE;
+        inputPanel.add(rightWrapper, gbc);
+
+        return inputPanel;
     }
     
     
     
-    // ---- HELPER FUNCTIONS ----
+    // ---- View Implementations ----
     
-    
+    @Override
+    public void showStartScreen() {
+        cardLayout.show(mainPanel, "Start");
+    }
+    @Override
     public void showGameScreen() {
         cardLayout.show(mainPanel, "Game");
     }
@@ -191,11 +297,13 @@ public class GameGUI implements GameView {
     
     // --- Start Panel ---
     @Override
-    public void setPlayerSetupHandler(ActionListener listener) {
+    public void setGameHandler(ActionListener listener) {
         joinButton.setActionCommand("Join");
         joinButton.addActionListener(listener);
         startGameButton.setActionCommand("Start");
         startGameButton.addActionListener(listener);
+        homeButton.setActionCommand("Home");
+        homeButton.addActionListener(listener);
     }
     @Override
     public String getEnteredPlayerName() {
@@ -242,20 +350,47 @@ public class GameGUI implements GameView {
         betField.setValue(null);
     }
     @Override
-    public void setCurrentPersonName(String name) {
-        currentPersonName.setText(name);
-    }
-    @Override
     public void setCurrentPersonBalance(double balance) {
-        currentPersonBalance.setText("Balance: " + balance);
+        currentPersonBalance.setText("Balance: $" + balance);
     }
     @Override
     public void setCurrentPersonBet(double bet) {
-        currentPersonBet.setText("Current Bet: " + bet);
+        currentPersonBet.setText("Current Bet: $" + bet);
     }
     @Override
     public void setActionTitle(String text) {
         actionTitle.setText(text);
+    }
+    @Override
+    public void displayPlayerHand(List<Card> cards) {
+        renderCardsInPanel(cards, playerHandPanel);
+    }
+    @Override
+    public void displayDealerHand(List<Card> cards) {
+        renderCardsInPanel(cards, dealerHandPanel);
+    }
+    // Shared helper
+    private void renderCardsInPanel(List<Card> cards, JPanel panel) {
+        panel.removeAll();
+        
+        int height = (panel == playerHandPanel) ? 120 : 80; 
+        /*
+        for (Card card : cards) {
+            String code = card.getFace().getCode() +"-"+ card.getSuit().getCode();
+            ImageIcon icon = cardIconMap.get(code);
+            Image scaled = icon.getImage().getScaledInstance(80, -1, Image.SCALE_SMOOTH);
+            JLabel lbl = new JLabel(new ImageIcon(scaled));
+            panel.add(lbl);
+        }
+        */
+        for (Card card : cards) {
+            String code = card.getFace().getCode() + "-" + card.getSuit().getCode();
+            ImageIcon icon = cardIconMap.get(code);
+            Image img = icon.getImage().getScaledInstance(-1, height, Image.SCALE_SMOOTH);
+            panel.add(new JLabel(new ImageIcon(img)));
+        }
+        panel.revalidate();
+        panel.repaint();
     }
     
     private String pretty(PlayerAction act) {

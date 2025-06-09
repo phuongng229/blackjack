@@ -96,14 +96,16 @@ public class Game {
     }
     
     public GameData getCurrentGameData() {
+        Person dealer = personList.get(playerCount); // Dealer always last in list
+        Person person = getCurrentPerson();
         GameData gameData = new GameData();
+        
         gameData.currentRound = currentRound;
         gameData.currentPhase = phase;
         gameData.playerCount = playerCount;
-        
-        Person person = getCurrentPerson();
-        gameData.currentPersonName = person.getName();
+        gameData.dealerHand = dealer.getHand();
         gameData.currentPersonHand = person.getHand();
+        gameData.currentPersonName = person.getName();
         gameData.currentPersonAvailableActions = getAvailablePlayerActions();
         if (person instanceof Player player) {
             gameData.currentPersonBalance = player.getBalance();
