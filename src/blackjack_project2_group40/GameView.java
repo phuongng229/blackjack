@@ -20,19 +20,23 @@ public interface GameView {
     void showMessage(String message);
     boolean promptYesNo(String message);
     
+    // Input Fields
+    String getEnteredPlayerName();
+    void clearPlayerNameField();
+    double getEnteredBetAmount();
+    void clearBetAmountField();
+
     // Player Setup
     void setPlayerSetupHandler(ActionListener listener);
     void updatePlayerCount(int count);
-    void clearPlayerNameField();
-    String getEnteredPlayerName();
-    
+
+    // Game Phase
     void setCurrentPersonName(String name);
     void setCurrentPersonBalance(double balance);
     void setCurrentPersonBet(double bet);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
     
-    // Betting Phase
     void showBetInput(boolean visible);
     
 }

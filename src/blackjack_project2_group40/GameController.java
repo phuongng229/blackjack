@@ -59,7 +59,13 @@ public class GameController implements ActionListener {
                 refreshView();
                 return;
             }
-            case "HIT", "STAND", "DOUBLE_DOWN", "QUIT" -> {
+            case "PLACE_BET" -> {
+                handleBetPlaced();
+                model.advance();
+                refreshView();
+                return;
+            }
+            case "HIT", "DOUBLE_DOWN", "STAND", "QUIT" -> {
                 try {
                     PlayerAction action = PlayerAction.valueOf(command);
                     String result = model.performPlayerAction(action);
@@ -81,10 +87,6 @@ public class GameController implements ActionListener {
     // Used by the "Join" command to handle players joining
     private void handlePlayerJoin() {
         String name = view.getEnteredPlayerName();
-        if (name.isEmpty()) {
-            view.showMessage("Name cannot be empty.");
-            return;
-        }
         if (model.playerNameIsTaken(name)) {
             showNameTakenMessage(name);
             return;
@@ -107,6 +109,23 @@ public class GameController implements ActionListener {
         view.showMessage("Sorry, " + name + " is already taken. Please enter a different name.");
         view.clearPlayerNameField();
     }
+    
+    private void handleBetPlaced() {
+        double bet = view.getEnteredBetAmount();
+        GameData data = model.getCurrentGameData();
+        
+        if (model.betExceedsBalance(bet)) {
+            view.showMessage(data.currentPersonName + ": Your bet exceeds your current balance.");
+            return;
+        }
+        if (model.betExceedsRange(bet)) {
+            view.showMessage(data.currentPersonName + ": Your bet does not fall within the allowed amount.");
+            return;
+        }
+        model.placeBet(bet);
+        view.clearBetAmountField();
+    }
+    
     
     // Refreshes aspects of the GUI when the game state changes. Called multiple times within GameControlelr
     private void refreshView() {

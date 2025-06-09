@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.text.DecimalFormat;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -44,8 +46,8 @@ public class GameGUI implements GameView {
     private final JButton startGameButton  = new JButton("Start Game");
     
     // Components for gamePanel
-    private final JTextField betField = new JTextField(6);
-    private final JLabel betFieldLabel = new JLabel("Amount:");
+    private final JFormattedTextField betField;
+    private final JLabel betFieldLabel = new JLabel("Amount: $");
     private final JPanel buttons = new JPanel();
     private final JLabel currentPersonName = new JLabel("");
     private final JLabel currentPersonBalance = new JLabel();
@@ -54,7 +56,18 @@ public class GameGUI implements GameView {
     
     public GameGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(600, 400);        
+        
+        // Uses formatter to create betField in currency format
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        decimalFormat.setMaximumFractionDigits(2);
+        decimalFormat.setGroupingUsed(false);
+        NumberFormatter formatter = new NumberFormatter(decimalFormat);
+        formatter.setValueClass(Double.class);
+        formatter.setAllowsInvalid(false); // prevents letters or symbols
+        formatter.setCommitsOnValidEdit(true);
+        betField = new JFormattedTextField(formatter);
+        betField.setColumns(6);
         
         setupStartPanel();
         setupGamePanel();
@@ -135,20 +148,19 @@ public class GameGUI implements GameView {
         detailsPanel.add(currentPersonBet);
         gamePanel.add(detailsPanel, BorderLayout.NORTH);
         
-        
         // --- Input panel (bottom) ---
         JPanel southPanel = new JPanel(new BorderLayout(0, 8)); // hgap=0px, vgap=8px (between NORTH and CENTER)
         southPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         actionTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        southPanel.add(actionTitle, BorderLayout.NORTH);
+        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
         
         JPanel inputPanel = new JPanel();
         inputPanel.add(betFieldLabel);
         inputPanel.add(betField);
-        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
         inputPanel.add(buttons);
         
+        southPanel.add(actionTitle, BorderLayout.NORTH);
         southPanel.add(inputPanel, BorderLayout.CENTER);
         gamePanel.add(southPanel, BorderLayout.SOUTH);
     }
@@ -180,8 +192,8 @@ public class GameGUI implements GameView {
     // --- Start Panel ---
     @Override
     public void setPlayerSetupHandler(ActionListener listener) {
-        joinButton.setActionCommand("Join"); // to differentiate it from others
-        joinButton.addActionListener(listener); // plain and simple
+        joinButton.setActionCommand("Join");
+        joinButton.addActionListener(listener);
         startGameButton.setActionCommand("Start");
         startGameButton.addActionListener(listener);
     }
@@ -216,6 +228,18 @@ public class GameGUI implements GameView {
     public void showBetInput(boolean visible) {
         betFieldLabel.setVisible(visible);
         betField.setVisible(visible);
+    }
+    @Override
+    public double getEnteredBetAmount() {
+        Object value = betField.getValue();
+        if (value instanceof Number n) {
+            return n.doubleValue();
+        }
+        return 0.0; 
+    }
+    @Override
+    public void clearBetAmountField() {
+        betField.setValue(null);
     }
     @Override
     public void setCurrentPersonName(String name) {

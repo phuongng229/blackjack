@@ -70,6 +70,31 @@ public class Game {
         return personList.get(currentPersonIndex);
     }
     
+    public boolean betExceedsRange(double amount) {
+        Person currentPerson = getCurrentPerson();
+        if (currentPerson instanceof Player player) {
+            return player.betExceedsRange(amount);
+        } else {
+            throw new IllegalStateException("Current person is not a Player");
+        }
+    }
+    
+    public boolean betExceedsBalance(double amount) {
+        Person currentPerson = getCurrentPerson();
+        if (currentPerson instanceof Player player) {
+            return player.betExceedsBalance(amount);
+        } else {
+            throw new IllegalStateException("Current person is not a Player");
+        }
+    }
+    
+    public void placeBet(double amount) {
+        Person person = getCurrentPerson();
+        if (person instanceof Player player) {
+            player.placeBet(amount);
+        }
+    }
+    
     public GameData getCurrentGameData() {
         GameData gameData = new GameData();
         gameData.currentRound = currentRound;
@@ -168,14 +193,14 @@ public class Game {
         return log.toString().trim(); // Returns log to GameController for GUI
     }
     
-    // Moves the game forward to the next step.  If all users have not finished their turn,
-    // it continues to the next user. Otherwise, continue to the next game phase (e.g. SETTLE, BETTING, etc.)
+    // Moves the game forward to the next step. If all players haven't finished their turn,
+    // it continues to the next player. Otherwise, continue to the next game phase (e.g. SETTLE, BETTING, etc.)
     public void advance() {
         switch (phase) {
             case BETTING -> {
                 // Move to next person in betting phase
                 currentPersonIndex++;
-                if (currentPersonIndex >= playerCount-1) {
+                if (currentPersonIndex >= playerCount) {
                     phase = Phase.PLAYER_TURN; // All players have bet so starts player turns
                     currentPersonIndex = 0;
                 }
