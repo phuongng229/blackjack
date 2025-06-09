@@ -240,8 +240,24 @@ public class Game {
         dealHands();
         System.out.println(getAvailablePlayerActions());
         System.out.println(getCurrentPerson().getHand());
-        //playRound();
-        //endRound();
+        
+        for (Person p : personList) {
+            p.clearLastAction();
+            if (p instanceof Player player) {
+                player.clearBet();
+            }
+            
+        }
+        checkDeck();
+        dealHands();
+
+    }
+    
+    private void checkDeck() {
+        //If deck runs low on cards. Lower than 5 cards, reload from discard pile
+        if (mainDeck.getCards().size() < 24) {
+            mainDeck.reloadDeck(discardDeck);
+        }
     }
     
     // Deals two cards to each Person's hand
@@ -253,36 +269,6 @@ public class Game {
             }
         }
     }
-    
-    
-    
-    
-    
-    /*
-    // Advance from “betting” phase to “deal” phase. 
-    public void dealInitialHands() { ... }
-
-    // Play a single round of player turns. 
-    public void playPlayers() { ... }
-
-    // Let the dealer play. 
-    public void playDealer() { ... }
-
-    // Compute wins/losses, update scores, discard hands. 
-    public void settleBets() { ... }
-
-    // Check deck size and reshuffle from discard if needed. 
-    public void refillDeckIfNeeded() { ... }
-
-    // Snapshot of everything the view needs to render right now. 
-    public GameState getState() { … }
-
-    // What UI buttons/actions are valid right now. 
-    public List<PlayerAction> getAvailableActions() { … }
-
-    // Perform the given action (HIT, STAND, NEXT_ROUND, QUIT). 
-    public String performAction(PlayerAction action) { … }
-    */
     
     /*
     private final Scanner scan;

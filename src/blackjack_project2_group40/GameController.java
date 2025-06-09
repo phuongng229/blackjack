@@ -6,7 +6,6 @@ package blackjack_project2_group40;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  *
@@ -139,22 +138,25 @@ public class GameController implements ActionListener {
         GameData data = model.getCurrentGameData();
         
         // Update GUI with GameData
-        view.setCurrentPersonBalance(data.currentPersonBalance);
-        view.setCurrentPersonBet(data.currentPersonBet);
+        view.setPersonBalanceLabel(data.currentPersonBalance);
+        view.setPersonBetLabel(data.currentPersonBet);
         view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
         
         switch (data.currentPhase) {
             case BETTING -> {
+                view.setRoundStatusLabel(data.currentPersonName + "'s Betting");
                 view.setActionTitle(data.currentPersonName + ", how much would you like to bet? (Min: $50 Max: $300)");
                 view.showBetInput(true);
             }
             case PLAYER_TURN -> {
+                view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
                 view.setActionTitle(data.currentPersonName + ", would you like to?");
                 view.showBetInput(false);
                 view.displayPlayerHand(data.currentPersonHand.getCards());
                 view.displayDealerHand(data.dealerHand.getCards());
             }
             case DEALER_TURN -> {
+                view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
                 view.setActionTitle("It's the dealer's turn");
                 System.out.println("The dealer performs their turn!"); // TO REMOVE
                 // If it’s the dealer’s turn, run it automatically.
@@ -164,6 +166,7 @@ public class GameController implements ActionListener {
                 refreshView(); // recursive refresh now in SETTLE
             }
             case SETTLE -> {
+                view.setRoundStatusLabel(data.currentPersonName);
                 view.setActionTitle(data.currentPersonName + ", you won/lost X amount. Would you like to?");
             }
             default -> {

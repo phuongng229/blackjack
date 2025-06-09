@@ -33,8 +33,9 @@ public interface GameView {
     void updatePlayerCount(int count);
 
     // Game Phase
-    void setCurrentPersonBalance(double balance);
-    void setCurrentPersonBet(double bet);
+    void setRoundStatusLabel(String text);
+    void setPersonBalanceLabel(double balance);
+    void setPersonBetLabel(double bet);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
     

@@ -42,6 +42,10 @@ public class Player extends Person implements Bettor {
         this.isActive = active;
     }
     
+    public void clearBet() {
+        this.currentBet = 0;
+    }
+    
     public boolean canPlaceBet(double amount) {
         return !betExceedsRange(amount) && !betExceedsBalance(amount);
     }

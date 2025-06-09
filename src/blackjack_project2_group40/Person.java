@@ -12,7 +12,6 @@ public abstract class Person {
     private final String name;
     private final Hand hand;
     private final Deck deck;
-    //private HandCheck handResults;
     private PlayerScores scores;
     private PlayerAction lastAction;
 
@@ -38,7 +37,7 @@ public abstract class Person {
     public void setScores(PlayerScores scores) { this.scores = scores; }
     public void setLastAction(PlayerAction lastAction) { this.lastAction = lastAction; }
     
-    public void resetLastAction() {
+    public void clearLastAction() {
         this.lastAction = null;
     }
     
