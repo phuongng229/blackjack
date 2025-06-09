@@ -31,6 +31,10 @@ public class Game {
         personList = new ArrayList<>();
     }
     
+    public int getCurrentRound() {
+        return currentRound;
+    }
+    
     // --- Player Setup ---
     
     public PlayerScores getPlayerScores(String name) {
@@ -60,7 +64,7 @@ public class Game {
     }
     
     public void setupDealer() {
-        Dealer dealer = new Dealer(mainDeck, "The dealer");
+        Dealer dealer = new Dealer(mainDeck, "Dealer");
         personList.add(dealer);
     }
     
@@ -117,23 +121,23 @@ public class Game {
     // Determines PlayerAction enum values that are currently avalilable to the player
     public List<PlayerAction> getAvailablePlayerActions() {
         Person currentPerson = getCurrentPerson();
-        if (currentPerson instanceof Player player) {
-            switch (phase) {
-                case BETTING -> {
-                    return List.of(PlayerAction.PLACE_BET);
-                }
-                case PLAYER_TURN -> {
-                    return player.getAvailableActions();
-                }
-                case SETTLE -> {
-                    return List.of(PlayerAction.NEXT_ROUND, PlayerAction.QUIT);
-                }
-                default -> {
-                    return List.of();
-                }
+        switch (phase) {
+            case BETTING -> {
+                return List.of(PlayerAction.PLACE_BET);
+            }
+            case PLAYER_TURN -> {
+                if (currentPerson instanceof Player player) return player.getAvailableActions();
+            }
+            case DEALER_TURN -> {
+                if (currentPerson instanceof Dealer) return List.of(PlayerAction.DEALER_CONTINUE);
+            }
+            case SETTLE -> {
+                return List.of(PlayerAction.NEXT_ROUND, PlayerAction.QUIT);
+            }
+            default -> {
+                return List.of();
             }
         }
-        // DEALER_TURN so no player actions
         return List.of();
     }
     
@@ -178,26 +182,31 @@ public class Game {
     
     // Runs the dealer's turn (different logic from players)
     public String performDealerTurn() {
-         System.out.println("Dealer turn!");
-        Dealer dealer = (Dealer)getCurrentPerson();
         StringBuilder log = new StringBuilder();
-        while (dealer.shouldHit()) {
-            Card drawCard = dealer.hit();
-            log.append(dealer.getName()).append(" hits and draws the ").append(drawCard).append("\n");
-            if (dealer.isBust()) {
-                log.append(dealer.getName()).append(" busts with ").append(dealer.getHand().getTotalValue()).append(".");
+        System.out.println("Dealer turn!");
+        Person person = getCurrentPerson();
+        System.out.println(currentPersonIndex);
+        if (person instanceof Dealer dealer) {
+            while (dealer.shouldHit()) {
+                Card drawCard = dealer.hit();
+                log.append(dealer.getName()).append(" hits and draws the ").append(drawCard).append("\n");
+                if (dealer.isBust()) {
+                    log.append(dealer.getName()).append(" busts with ").append(dealer.getHand().getTotalValue()).append(".");
+                }
             }
+            if (!dealer.isBust()) {
+                log.append(dealer.getName()).append(" stands at ").append(dealer.getHand().getTotalValue()).append(".");
+            }
+        } else {
+            throw new IllegalStateException("Current person is not the Dealer");
         }
-        if (!dealer.isBust()) {
-            log.append(dealer.getName()).append(" stands at ").append(dealer.getHand().getTotalValue()).append(".");
-        }
-        advance(); // Move into SETTLE phase
-        return log.toString().trim(); // Returns log to GameController for GUI
+        return log.toString().trim();
     }
     
     // Moves the game forward to the next step. If all players haven't finished their turn,
     // it continues to the next player. Otherwise, continue to the next game phase (e.g. SETTLE, BETTING, etc.)
     public void advance() {
+        System.out.println("Advance");
         switch (phase) {
             case BETTING -> {
                 // Move to next person in betting phase
@@ -208,7 +217,7 @@ public class Game {
                 }
             }
             case PLAYER_TURN -> {
-                if (getCurrentPerson().getLastAction()==PlayerAction.STAND) {
+                if (getCurrentPerson().getLastAction()==PlayerAction.STAND || getCurrentPerson().getLastAction()==PlayerAction.DOUBLE_DOWN) {
                     // has stood so move to next person’s turn
                     currentPersonIndex++;
                     if (currentPersonIndex >= playerCount) {
@@ -217,9 +226,12 @@ public class Game {
                 }
             }
             case DEALER_TURN -> {
-                // Move to settling phase (settling bets and determining winners)
                 phase = Phase.SETTLE;
-                currentPersonIndex = 0; // start settling from first player
+                currentPersonIndex = 0;
+                if (currentPersonIndex > playerCount) {
+                     // Move to settling phase (settling bets and determining winners)
+                     // start settling from first player
+                }
             }
             case SETTLE -> {
                 // Move through each player to settle bets
@@ -236,21 +248,16 @@ public class Game {
         phase = Phase.BETTING;
         currentPersonIndex = 0;
         currentRound++;
-        //checkDeck();
-        dealHands();
-        System.out.println(getAvailablePlayerActions());
-        System.out.println(getCurrentPerson().getHand());
-        
+
         for (Person p : personList) {
             p.clearLastAction();
             if (p instanceof Player player) {
                 player.clearBet();
             }
-            
         }
         checkDeck();
         dealHands();
-
+        System.out.println(getCurrentPerson().getHand());
     }
     
     private void checkDeck() {
@@ -268,6 +275,10 @@ public class Game {
                 person.getHand().addCard(mainDeck.drawCard());
             }
         }
+    }
+    
+    public void settleBets() {
+        
     }
     
     /*

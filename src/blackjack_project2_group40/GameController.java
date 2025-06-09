@@ -58,12 +58,31 @@ public class GameController implements ActionListener {
                 return;
             }
             case "NEXT_ROUND" -> {
+                System.out.println("[DEBUG] NEXT_ROUND clicked");
+
+                // BEFORE advance
+                int oldRound = model.getCurrentRound();
+
                 model.advance();
+
+                int newRound = model.getCurrentRound();
+                System.out.println("[DEBUG] Old round: " + oldRound + ", New round: " + newRound);
+
+                if (newRound > oldRound) {
+                    System.out.println("[DEBUG] Detected new round");
+                    view.showMessage("=== Starting Round " + newRound + " ===");
+                }
+
                 refreshView();
                 return;
             }
             case "PLACE_BET" -> {
                 handleBetPlaced();
+                return;
+            }
+            case "DEALER_CONTINUE" -> {
+                model.advance();
+                refreshView();
                 return;
             }
             case "HIT", "DOUBLE_DOWN", "STAND", "QUIT" -> {
@@ -141,29 +160,26 @@ public class GameController implements ActionListener {
         view.setPersonBalanceLabel(data.currentPersonBalance);
         view.setPersonBetLabel(data.currentPersonBet);
         view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
+        view.displayPlayerHand(data.currentPersonHand.getCards());
+        view.displayDealerHand(data.dealerHand.getCards());
         
         switch (data.currentPhase) {
             case BETTING -> {
                 view.setRoundStatusLabel(data.currentPersonName + "'s Betting");
-                view.setActionTitle(data.currentPersonName + ", how much would you like to bet? (Min: $50 Max: $300)");
+                view.setActionTitle(data.currentPersonName + ", how much would you like to bet? ($50 - $300 Max)");
                 view.showBetInput(true);
             }
             case PLAYER_TURN -> {
                 view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
                 view.setActionTitle(data.currentPersonName + ", would you like to?");
                 view.showBetInput(false);
-                view.displayPlayerHand(data.currentPersonHand.getCards());
-                view.displayDealerHand(data.dealerHand.getCards());
             }
             case DEALER_TURN -> {
+                System.out.println("New Dealers turn!");
                 view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
                 view.setActionTitle("It's the dealer's turn");
-                System.out.println("The dealer performs their turn!"); // TO REMOVE
-                // If it’s the dealer’s turn, run it automatically.
-                // This maybe shouldn't be here but it needs to be triggered on phase change, ideally from GameController
-                String dealerLog = model.performDealerTurn();
-                view.showMessage(dealerLog);
-                refreshView(); // recursive refresh now in SETTLE
+                String result = model.performDealerTurn();
+                view.showMessage(result);
             }
             case SETTLE -> {
                 view.setRoundStatusLabel(data.currentPersonName);

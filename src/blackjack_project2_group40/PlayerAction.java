@@ -9,7 +9,7 @@ package blackjack_project2_group40;
  * @author jonathan & phuong
  */
 public enum PlayerAction {
-    HIT("Hit"), STAND("Stand"), QUIT("Quit"), DOUBLE_DOWN("Double Down"), PLACE_BET("Place Bet"), NEXT_ROUND("Next Round");
+    HIT("Hit"), STAND("Stand"), QUIT("Quit"), DOUBLE_DOWN("Double Down"), PLACE_BET("Place Bet"), NEXT_ROUND("Keep Playing"), DEALER_CONTINUE("Settle Bets");
     private final String label;
 
     PlayerAction(String label) {

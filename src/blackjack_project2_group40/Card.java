@@ -36,7 +36,6 @@ public class Card {
     
     @Override
     public String toString() {
-        return face.toString() + "-" + suit.toString();
-//        return face.toString() + " of " + suit.toString();
+        return face.toString() + " of " + suit.toString();
     }
 }
