@@ -16,11 +16,13 @@ public class PlayerScores {
     private int totalWins;
     private int totalLosses;
     private int totalPushes;
+    private double balance;
     
     public PlayerScores() {
         this.totalWins = 0;
         this.totalLosses = 0;
         this.totalPushes = 0;
+        this.balance = balance;
     }
     
     //Get methods
@@ -36,6 +38,10 @@ public class PlayerScores {
         return totalLosses;
     }
     
+    public double getBalance() {
+        return balance;
+    }
+    
     public void setTotalLosses(int totalLosses) {
         this.totalLosses = totalLosses;
     }
@@ -46,6 +52,10 @@ public class PlayerScores {
     
     public void setTotalPushes(int totalPushes) {
         this.totalPushes = totalPushes;
+    }
+    
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
     
     //Increment methods
@@ -66,7 +76,8 @@ public class PlayerScores {
         return (
             "Wins: "+ totalWins +", "+
             "Losses: "+ totalLosses +", "+
-            "Pushes: "+ totalPushes                
+            "Pushes: "+ totalPushes +", "+
+            "Balance: "+ balance
         );
     }
 }

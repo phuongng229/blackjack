@@ -140,15 +140,68 @@ public class Game {
 
     //Game loop
     private void doGameLoop() {
-        while (true) { // Currently loops forever, playing a new round each time
+//        for (Person person : personList) {
+//            if (person instanceof Player player && player.isActive()) {
+//                player.promptForBet();
+//            }
+//        }
+        
+        while (true) {
             currentRound++;
             System.out.println("------------------------------------------------------------------------");
             System.out.println("Round " + currentRound + "...");
+            
+            for (Person person : personList) {
+            if (person instanceof Player player && player.isActive()) {
+                player.promptForBet();
+            }
+        }
+            
             checkDeck();
             dealHands();
             playRound();
             endRound();
+            
+            //After each round, asking if the player want to either continue or quit the game
+            if (!askContinueGame()) { 
+                break; //Ending the game completely
+            }
         }
+    }
+    
+    private boolean askContinueGame() {
+        boolean anyPlayerWantToContinue = false;
+        boolean allPlayerQuit = true;
+        
+        for (Person person : personList)
+            if (person instanceof Player player) {
+                if (!player.isActive()) {
+                    continue;
+                }
+                //Asking if player wants to continue or quit
+                System.out.println("------------------------------------------------------------------------");
+                System.out.println(person.getName() + ", would you like to play another round? (y/n or 'x' to quit the game)");
+                
+                String answer = scan.nextLine().trim().toLowerCase();
+                
+                if (answer.equalsIgnoreCase("x") || answer.equalsIgnoreCase("n")) {
+                    System.out.println(person.getName() + " has chosen to quit the game.\nThanks for playing. See you again soon!");
+                    ((Player) person).quit();
+                } else if (answer.equalsIgnoreCase("y")) {
+                    System.out.println(person.getName() + " continues to play the next round.");
+                    anyPlayerWantToContinue = true;
+                    allPlayerQuit = false;
+                } else {
+                    System.out.println("Invalid input. Please enter 'y' to continue, 'n' or 'x' to quit the game.");
+                    return askContinueGame();
+                }
+            }
+        
+        if (allPlayerQuit) {
+            return false;
+        }
+        
+        return anyPlayerWantToContinue;
     }
 
     //Deal cards to players and dealer
@@ -172,7 +225,7 @@ public class Game {
             Person person = iterator.next();
 
             //Skip dealer, doing players first
-            if (person instanceof Dealer) {
+            if (person instanceof Dealer || !((Player) person).isActive()) {
                 continue;
             }
             System.out.println("------------------------------------------------------------------------");
@@ -202,7 +255,7 @@ public class Game {
         System.out.println(dealer.getHand() + ". Total value: " + dealer.getHand().getTotalValue());
         
         for (Person person : personList) {
-            if (person instanceof Dealer || person.getLastAction() == Action.QUIT) {
+            if (person instanceof Dealer || person.getLastAction() == Action.QUIT || !((Player) person).isActive()) {
                 continue;
             }
 
@@ -212,14 +265,17 @@ public class Game {
                 case WIN -> {
                     System.out.println(person.getName() + ", you win!");
                     person.getScores().incrementWins();
+                    ((Player) person).winBet();
                 }
                 case LOSE -> {
                     System.out.println(person.getName() + ", you lose!");
                     person.getScores().incrementLosses();
+                    ((Player) person).loseBet();
                 }
                 case PUSH -> {
                     System.out.println(person.getName() + ", you push!");
                     person.getScores().incrementPushes();
+                    ((Player) person).pushBet();
                 }
             }
             System.out.println("You now have a total of " + person.getScores());

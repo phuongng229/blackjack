@@ -48,7 +48,7 @@ public class ScoreStore {
 
             while ((eachLine = reader.readLine()) != null) {
                 String[] partsOfLine = eachLine.split(",");
-                if (partsOfLine.length == 4) {
+                if (partsOfLine.length >= 5) {
                     String playerName = partsOfLine[0];
 
                     //Creates a PlayerScores object and assigns values to it
@@ -56,6 +56,7 @@ public class ScoreStore {
                     scores.setTotalWins(Integer.parseInt(partsOfLine[1]));
                     scores.setTotalLosses(Integer.parseInt(partsOfLine[2]));
                     scores.setTotalPushes(Integer.parseInt(partsOfLine[3]));
+                    scores.setBalance(Double.parseDouble(partsOfLine[4]));
 
                     scoreInMap.put(playerName, scores);
                 }
@@ -72,7 +73,7 @@ public class ScoreStore {
             for (Map.Entry<String, PlayerScores> entry : scoreInMap.entrySet()) {
                 String name = entry.getKey();
                 PlayerScores scores = entry.getValue();
-                writerFile.write(name + "," + scores.getTotalWins() + "," + scores.getTotalLosses() + "," + scores.getTotalPushes());
+                writerFile.write(name + "," + scores.getTotalWins() + "," + scores.getTotalLosses() + "," + scores.getTotalPushes() + "," + scores.getBalance());
                 writerFile.newLine();
             }
         } catch (IOException io) {

@@ -12,18 +12,129 @@ import java.util.Scanner;
  *
  * @author jonathan & phuong
  */
-public class Player extends Person {
+public class Player extends Person implements Bettor {
     private final Scanner scan = new Scanner(System.in);
     private List<Action> availableActions;
+    private boolean isActive;
+    private double balance;
+    private static final double INITIAL_BALANCE = 2000;
+    private static final double MIN_BET = 50;
+    private static final double MAX_BET = 300;
+    private double currentBet;
     
     public Player(Deck deck, String name, PlayerScores scores) {
         super(deck, name);
         setScores(scores);
+        this.isActive = true;
+        this.balance = INITIAL_BALANCE;
+        this.currentBet = 0;
+    }
+    
+    @Override
+    public double getBalance() {
+        return balance;
+    }
+    
+    @Override
+    public double getCurrentBet() {
+        return currentBet;
+    }
+    
+    public boolean isActive() {
+        return isActive;
+    }
+    
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
+    
+    public void quit() {
+        this.isActive = false;
+    }
+    
+    @Override
+    public void placeBet(double amount) {
+        if (amount <= balance) {
+            currentBet = amount;
+            balance -= amount;
+        } else {
+            throw new IllegalArgumentException("Insufficient balance for the bet.");
+        }
+    }
+    
+    public void promptForBet() { 
+        while (true) {
+            System.out.println("------------------------------------------------------------------------");
+            System.out.println(getName() + ", your current balance is: $" + balance);
+            System.out.println("Enter your bet amount (min bet $" + MIN_BET + ", max bet $" + MAX_BET + "):");
+            
+            String input = scan.nextLine().trim();
+            try {
+                double bet = Double.parseDouble(input);
+                if (betExceedsRange(bet)) {
+                    System.out.println("Bet must be between $" + MIN_BET + " and $" + MAX_BET);
+                } else if (betExceedsBalance(bet)) {
+                    System.out.println("Insufficient balance. Enter a lower amount.");
+                } else {
+                    placeBet(bet);
+                    System.out.println("You placed a bet of $" + bet + ". Remaining balance: $" + getBalance());
+                    break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number");
+            }
+        }
+    }
+    
+    public boolean betExceedsRange(double bet) {
+        return bet < MIN_BET || bet > MAX_BET;
+    }
+    
+    public boolean betExceedsBalance(double bet) {
+        return bet > balance;
+    }
+    
+    public boolean isValidBet(double bet) {
+        return !betExceedsRange(bet) && !betExceedsBalance(bet);
+    }
+    
+    @Override
+    public void winBet() {
+        double wins = currentBet;
+        double returnAmount = currentBet * 2;
+        System.out.println(getName() + " wins $" + wins);
+        balance += returnAmount;
+        getScores().setBalance(balance);
+        System.out.println("Your balance is $" + balance);
+        currentBet = 0;
+    }
+    
+    @Override
+    public void pushBet() {
+        System.out.println(getName() + " pushes. Bet of $" + currentBet + " returned.");
+        balance += currentBet;
+        getScores().setBalance(balance);
+        System.out.println("Your balance is $" + balance);
+        currentBet = 0;
+    }
+    
+    @Override
+    public void loseBet() {
+        System.out.println(getName() + " loses the bet of $" + currentBet);
+        System.out.println("Your balance is $" + balance);
+        getScores().setBalance(balance);
+        currentBet = 0;
     }
     
     @Override
     public void playTurn() {
+        if (!isActive) {
+            return; //Skip if the player is not active
+        }
+        
         resetLastAction(); //Using method from Person
+        //promptForBet();
+        
         System.out.println(getName() + ", it's your turn!");
         printHandDetails();
         
@@ -37,7 +148,7 @@ public class Player extends Person {
         updateHandResults(); //Update handResults BEFORE entering the loop
         
         //Loop to let users choose their action and update the Hand Result
-        while (getLastAction() != Action.STAND && !isBust() && getLastAction() != Action.QUIT) {
+        while (getLastAction() != Action.STAND && !isBust()) {
             updateAvailableAction();
             Action action = promptForAction();
             performAction(action);
@@ -61,8 +172,8 @@ public class Player extends Person {
         availableActions = new ArrayList<>();
         if (getHandResults().canHit) availableActions.add(Action.HIT);
         if (getHandResults().canStand) availableActions.add(Action.STAND);
-        /*if (handResults.canSplit) availableActions.add(Action.SPLIT);
-        if (handResults.canDoubleDown) availableActions.add(Action.DOUBLE_DOWN);*/
+        //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
+        if (getHandResults().canDoubleDown && balance >= currentBet) availableActions.add(Action.DOUBLE_DOWN);
     }
     
     private Action promptForAction() {
@@ -73,13 +184,9 @@ public class Player extends Person {
                 System.out.printf("(%d) %s%n", i + 1, availableActions.get(i));
             }
             
-            //Let them enter their choice or x to exit
-            System.out.println("Enter your choice (or enter 'x' to exit): ");
+            //Let them enter their choice
+            System.out.println("Enter your choice: ");
             String input = scan.nextLine().trim();
-            if (input.equalsIgnoreCase("x")) {
-//                System.out.println("Thanks for playing. See you again soon!");
-                return Action.QUIT;
-            }
             
             try {
                 int inputChoice = Integer.parseInt(input);
@@ -90,37 +197,49 @@ public class Player extends Person {
                 //Let fall through
             }
             
-            System.out.printf("Invalid input. Please enter a number between 1 and %d, or 'x' to quit.%n", availableActions.size());   
+            System.out.printf("Invalid input. Please enter a number between 1 and %d.%n", availableActions.size());   
             
         }
     }
     
     private void performAction(Action action) {
-        if (action == Action.QUIT) {
-            System.out.println(getName() + " has left the game.");
-            setLastAction(Action.QUIT);
-            return;
-        }
         
-        switch (action) {
-            case HIT -> hit();
-            case STAND -> stand();
-            /*case SPLIT -> split();
-            case DOUBLE_DOWN -> doubleDown();*/
+        if (action == Action.DOUBLE_DOWN) {
+            doubleDown();
+        } else if (action == Action.HIT) {
+            hit();
+            setLastAction(action);
+        } else if (action == Action.STAND) {
+            stand();
+            setLastAction(action);
         }
-        setLastAction(action);   
+    }
+    
+    // Used by hit and double down methods to draw a card, print hand details, update hand results and let the user know if they're bust. 
+    private void drawAndProcessCard(String format) {
+        Card drawCard = getDeck().drawCard();
+        getHand().addCard(drawCard);
+        
+        System.out.println(String.format(format, drawCard));
+        printHandDetails();
+        updateHandResults();
+
+        if (isBust()) {
+            System.out.println("You are bust!");
+        }
     }
     
     private void hit() {
-        Card drawCard = getDeck().drawCard();
-        getHand().addCard(drawCard);
-        System.out.println("You hit and draw the [" + drawCard + "].");
-        printHandDetails();
-        
-        updateHandResults(); //Update if isBust()
-        
-        if (isBust()) {
-            System.out.println("You are bust!");
+        drawAndProcessCard("You hit and draw the [%s].");
+    }
+    
+    private void doubleDown() {
+        if (balance >= currentBet) {
+            balance -= currentBet;
+            currentBet *= 2;
+            System.out.println("You double down and increase your bet to $" + currentBet + ". Remaining balance: $" + getBalance());
+            drawAndProcessCard("You draw the [%s].");
+            setLastAction(Action.STAND);
         }
     }
     

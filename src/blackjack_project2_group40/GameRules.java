@@ -19,16 +19,20 @@ public class GameRules {
         handResults.isBust = totalValue > 21;
         handResults.canHit = !handResults.isBlackjack; //if hand isn't a blackjack
         handResults.canStand = true;
-        handResults.canSplit = hand.getCard(0).getValue() == hand.getCard(1).getValue(); //if hand contains 2 cards of equal value
         handResults.canDoubleDown = hand.getSize() == 2; //if player is on their first 2 cards
         
         return handResults;
     }
     
+    /*
+        Win: the player's hand beats the dealers hand without going bust (or the dealer goes bust)
+        Lose: the player's hand doesn't beat the dealer's hand (or the player goes bust)
+        Push: the player's hand is equal (tied) to the dealer's hand (and neither goes bust)
+    */
+    
     public enum Result {
         WIN, LOSE, PUSH
     }
-    
     public static Result getPlayerResult(Person player, Person dealer) {
         if (player.isBust()) return Result.LOSE;
         if (dealer.isBust()) return Result.WIN;

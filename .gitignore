@@ -1,1 +1,34 @@
+# Build output
+/build/
+/dist/
+/target/
+
+# NetBeans-specific folders
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/nbactions.xml
+
+# Compiled classes
+*.class
+
+# Logs
+*.log
+
+# IDE metadata (optional)
+*.iml
+.idea/
+.vscode/
+
+# OS-specific
 .DS_Store
+/src/.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+
+# Database or local files (if not sharing)
+*.db
+db/
