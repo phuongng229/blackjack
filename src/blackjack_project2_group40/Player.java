@@ -104,6 +104,7 @@ public class Player extends Person implements Bettor {
         double returnAmount = currentBet * 2;
         System.out.println(getName() + " wins $" + wins);
         balance += returnAmount;
+        getScores().setBalance(balance);
         System.out.println("Your balance is $" + balance);
         currentBet = 0;
     }
@@ -112,6 +113,7 @@ public class Player extends Person implements Bettor {
     public void pushBet() {
         System.out.println(getName() + " pushes. Bet of $" + currentBet + " returned.");
         balance += currentBet;
+        getScores().setBalance(balance);
         System.out.println("Your balance is $" + balance);
         currentBet = 0;
     }
@@ -120,6 +122,7 @@ public class Player extends Person implements Bettor {
     public void loseBet() {
         System.out.println(getName() + " loses the bet of $" + currentBet);
         System.out.println("Your balance is $" + balance);
+        getScores().setBalance(balance);
         currentBet = 0;
     }
     
@@ -203,11 +206,13 @@ public class Player extends Person implements Bettor {
         
         if (action == Action.DOUBLE_DOWN) {
             doubleDown();
-        } else {
-            if (action == Action.HIT);
-            else if (action == Action.STAND);
+        } else if (action == Action.HIT) {
+            hit();
             setLastAction(action);
-        }  
+        } else if (action == Action.STAND) {
+            stand();
+            setLastAction(action);
+        }
     }
     
     // Used by hit and double down methods to draw a card, print hand details, update hand results and let the user know if they're bust. 
