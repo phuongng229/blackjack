@@ -25,7 +25,7 @@ public class Game {
     private int playerCount = 0;
     private int currentRound = 0;
     
-    private Phase phase = Phase.PLAYER_TURN; // CHANGE TO BETTING LATER - BETTING PANEL CURRENTLY BROKEN
+    private Phase phase = Phase.BETTING;
 
     public Game() {
         personList = new ArrayList<>();
@@ -66,16 +66,25 @@ public class Game {
     
     // -- Player Turns --
     
-    public int getCurrentRound() {
-        return currentRound;
-    }
-    
-    public Phase getCurrentPhase() {
-        return phase;
-    }
-    
     public Person getCurrentPerson() {
         return personList.get(currentPersonIndex);
+    }
+    
+    public GameData getCurrentGameData() {
+        GameData gameData = new GameData();
+        gameData.currentRound = currentRound;
+        gameData.currentPhase = phase;
+        gameData.playerCount = playerCount;
+        
+        Person person = getCurrentPerson();
+        gameData.currentPersonName = person.getName();
+        gameData.currentPersonHand = person.getHand();
+        gameData.currentPersonAvailableActions = getAvailablePlayerActions();
+        if (person instanceof Player player) {
+            gameData.currentPersonBalance = player.getBalance();
+            gameData.currentPersonBet = player.getCurrentBet();
+        }
+        return gameData;
     }
     
     // Determines PlayerAction enum values that are currently avalilable to the player
@@ -197,7 +206,7 @@ public class Game {
     
     // Reset for the next round
     public void startNewRound() {
-        phase = Phase.PLAYER_TURN; // CHANGE TO BETTING LATER - BETTING PANEL CURRENTLY BROKEN
+        phase = Phase.BETTING;
         currentPersonIndex = 0;
         currentRound++;
         //checkDeck();

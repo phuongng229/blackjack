@@ -110,28 +110,42 @@ public class GameController implements ActionListener {
     
     // Refreshes aspects of the GUI when the game state changes. Called multiple times within GameControlelr
     private void refreshView() {
-        System.out.print("View Refreshed");
+        System.out.println("View Refreshed");
         
-        Game.Phase phase = model.getCurrentPhase();
-        Person person = model.getCurrentPerson();
-        //view.showMessage("Phase: " + phase + " — " + person.getName() + "'s turn");
+        GameData data = model.getCurrentGameData();
         
-        //view.showPhase(phase);
+        // Update GUI with GameData
+        view.setCurrentPersonName(data.currentPersonName);
+        view.setCurrentPersonBalance(data.currentPersonBalance);
+        view.setCurrentPersonBet(data.currentPersonBet);
+        view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
         
-        view.setCurrentPlayerName(person.getName()); // Update GUI player name label
-
-        // If it’s the dealer’s turn, run it automatically.
-        // This method probably shouldn't be here but it needs to be somewhere it can be triggered on phase change
-        if (model.getCurrentPhase() == Game.Phase.DEALER_TURN) {
-            String dealerLog = model.performDealerTurn();
-            view.showMessage(dealerLog);
-            refreshView(); // recursive refresh now in SETTLE
-            return;
-        }        
-
-        // Otherwise, show the buttons for the current player
-        List<PlayerAction> actions = model.getAvailablePlayerActions();
-        view.setActionButtons(actions, this);
+        switch (data.currentPhase) {
+            case BETTING -> {
+                view.setActionTitle(data.currentPersonName + ", how much would you like to bet? (Min: $50 Max: $300)");
+                view.showBetInput(true);
+            }
+            case PLAYER_TURN -> {
+                view.setActionTitle(data.currentPersonName + ", would you like to?");
+                view.showBetInput(false);
+            }
+            case DEALER_TURN -> {
+                view.setActionTitle("It's the dealer's turn");
+                System.out.println("The dealer performs their turn!"); // TO REMOVE
+                // If it’s the dealer’s turn, run it automatically.
+                // This maybe shouldn't be here but it needs to be triggered on phase change, ideally from GameController
+                String dealerLog = model.performDealerTurn();
+                view.showMessage(dealerLog);
+                refreshView(); // recursive refresh now in SETTLE
+            }
+            case SETTLE -> {
+                view.setActionTitle(data.currentPersonName + ", you won/lost X amount. Would you like to?");
+            }
+            default -> {
+                view.setActionTitle("");
+            }
+        }
+        
     }
     
 }

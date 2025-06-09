@@ -19,7 +19,7 @@ public class GameRules {
         
         handResults.isBlackjack = totalValue == 21;
         handResults.isBust = totalValue > 21;
-        handResults.canHit = !handResults.isBlackjack; //if hand isn't a blackjack
+        handResults.canHit = !handResults.isBust; //if hand isn't bust
         handResults.canStand = true;
         handResults.canDoubleDown = hand.getSize() == 2; //if player is on their first 2 cards
         
@@ -31,7 +31,6 @@ public class GameRules {
         Lose: the player's hand doesn't beat the dealer's hand (or the player goes bust)
         Push: the player's hand is equal (tied) to the dealer's hand (and neither goes bust)
     */
-    
     public enum Result {
         WIN, LOSE, PUSH
     }

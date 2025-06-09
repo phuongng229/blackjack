@@ -43,7 +43,15 @@ public class Player extends Person implements Bettor {
     }
     
     public boolean canPlaceBet(double amount) {
-        return amount >= MIN_BET && amount <= MAX_BET && amount <= balance;
+        return !betExceedsRange(amount) && !betExceedsBalance(amount);
+    }
+    
+    public boolean betExceedsRange(double amount) {
+        return amount < MIN_BET || amount > MAX_BET;
+    }
+    
+    public boolean betExceedsBalance(double amount) {
+        return amount > balance;
     }
     
     @Override
@@ -70,24 +78,13 @@ public class Player extends Person implements Bettor {
         currentBet = 0;
     }
     
-    public boolean betExceedsRange(double bet) {
-        return bet < MIN_BET || bet > MAX_BET;
-    }
-    
-    public boolean betExceedsBalance(double bet) {
-        return bet > balance;
-    }
-    
-    public boolean isValidBet(double bet) {
-        return !betExceedsRange(bet) && !betExceedsBalance(bet);
-    }
     
     public List<PlayerAction> getAvailableActions() {
         List<PlayerAction> availableActions = new ArrayList<>();
         HandCheck handResults = getHandResults();
         if (handResults.canHit) availableActions.add(PlayerAction.HIT);
         if (handResults.canStand) availableActions.add(PlayerAction.STAND);
-        if (handResults.canDoubleDown && isValidBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN); //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
+        if (handResults.canDoubleDown && canPlaceBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN); //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
 
         return availableActions;
     }

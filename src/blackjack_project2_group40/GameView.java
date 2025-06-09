@@ -26,6 +26,13 @@ public interface GameView {
     void clearPlayerNameField();
     String getEnteredPlayerName();
     
-    void setCurrentPlayerName(String name);
+    void setCurrentPersonName(String name);
+    void setCurrentPersonBalance(double balance);
+    void setCurrentPersonBet(double bet);
+    void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
+    
+    // Betting Phase
+    void showBetInput(boolean visible);
+    
 }

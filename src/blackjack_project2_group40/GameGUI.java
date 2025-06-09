@@ -44,8 +44,13 @@ public class GameGUI implements GameView {
     private final JButton startGameButton  = new JButton("Start Game");
     
     // Components for gamePanel
+    private final JTextField betField = new JTextField(6);
+    private final JLabel betFieldLabel = new JLabel("Amount:");
     private final JPanel buttons = new JPanel();
-    private final JLabel currentPlayerName = new JLabel("");
+    private final JLabel currentPersonName = new JLabel("");
+    private final JLabel currentPersonBalance = new JLabel();
+    private final JLabel currentPersonBet = new JLabel();
+    private final JLabel actionTitle = new JLabel("Would you like to?");
     
     public GameGUI() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,9 +129,30 @@ public class GameGUI implements GameView {
     }
 
     private void setupGamePanel() {
-        gamePanel.add(buttons, BorderLayout.SOUTH);
-        gamePanel.add(currentPlayerName , BorderLayout.NORTH);
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.add(currentPersonName);
+        detailsPanel.add(currentPersonBalance);
+        detailsPanel.add(currentPersonBet);
+        gamePanel.add(detailsPanel, BorderLayout.NORTH);
+        
+        
+        // --- Input panel (bottom) ---
+        JPanel southPanel = new JPanel(new BorderLayout(0, 8)); // hgap=0px, vgap=8px (between NORTH and CENTER)
+        southPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        actionTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        southPanel.add(actionTitle, BorderLayout.NORTH);
+        
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(betFieldLabel);
+        inputPanel.add(betField);
+        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        inputPanel.add(buttons);
+        
+        southPanel.add(inputPanel, BorderLayout.CENTER);
+        gamePanel.add(southPanel, BorderLayout.SOUTH);
     }
+    
     
     
     // ---- HELPER FUNCTIONS ----
@@ -187,10 +213,27 @@ public class GameGUI implements GameView {
         buttons.repaint();
     }
     @Override
-    public void setCurrentPlayerName(String name) {
-        currentPlayerName.setText(name);
+    public void showBetInput(boolean visible) {
+        betFieldLabel.setVisible(visible);
+        betField.setVisible(visible);
     }
-
+    @Override
+    public void setCurrentPersonName(String name) {
+        currentPersonName.setText(name);
+    }
+    @Override
+    public void setCurrentPersonBalance(double balance) {
+        currentPersonBalance.setText("Balance: " + balance);
+    }
+    @Override
+    public void setCurrentPersonBet(double bet) {
+        currentPersonBet.setText("Current Bet: " + bet);
+    }
+    @Override
+    public void setActionTitle(String text) {
+        actionTitle.setText(text);
+    }
+    
     private String pretty(PlayerAction act) {
         String s = act.name().toLowerCase().replace('_',' ');
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
