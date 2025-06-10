@@ -43,10 +43,11 @@ public interface GameView {
     void setDealerHandTitle(String text);
     void setCurrentPersonBust(boolean bust); 
     void setDealerBust(boolean bust);
+    void setPlayerHand(List<Card> cards);
+    void setDealerHand(List<Card> cards);
     
+    void showPlayerHand(boolean visible);
+    void showDealerHand(boolean visible);
     void showBetInput(boolean visible);
-    
-    void displayPlayerHand(List<Card> cards);
-    void displayDealerHand(List<Card> cards);
     
 }

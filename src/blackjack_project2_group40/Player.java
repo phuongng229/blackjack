@@ -85,15 +85,18 @@ public class Player extends Person implements Bettor {
     public List<PlayerAction> getAvailableActions() {
         List<PlayerAction> availableActions = new ArrayList<>();
         HandCheck handResults = getHandResults();
-        if (handResults.canHit) availableActions.add(PlayerAction.HIT);
+        // Additional check for whether the player has doubled down, in which case their only available action is now to stand.
+        if (handResults.canHit && getLastAction()!= PlayerAction.DOUBLE_DOWN) availableActions.add(PlayerAction.HIT);
         if (handResults.canStand) availableActions.add(PlayerAction.STAND);
-        if (handResults.canDoubleDown && canPlaceBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN); //checks if the hand can double down and whether doubling down would exceed max/min betting range or player balance
+        // Additional check for whether doubling down would cause bet to exceed max/min betting range or player balance.
+        if (handResults.canDoubleDown && canPlaceBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
 
         return availableActions;
     }
     
     public Card doubleDown() {
-        placeBet(currentBet * 2);
+        placeBet(currentBet);
+        currentBet = currentBet * 2;
         Card drawCard = getDeck().drawCard();
         getHand().addCard(drawCard);
         return drawCard;

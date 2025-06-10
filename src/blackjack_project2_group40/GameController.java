@@ -70,6 +70,10 @@ public class GameController implements ActionListener {
             }
             case "HIT", "DOUBLE_DOWN", "STAND", "QUIT" -> {
                 try {
+                    if(model.getPlayerCount() < 2) { // Exits to menu if last player chooses to quit
+                        handleGameQuit();
+                        return;
+                    }
                     PlayerAction action = PlayerAction.valueOf(command);
                     List<String> logs = model.performPlayerAction(action);
                     logs.forEach(log -> view.showMessage(log));
@@ -176,27 +180,39 @@ public class GameController implements ActionListener {
         view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue);
         view.setPlayerHandTitle(data.currentPersonName + "'s Hand Value: " + data.currentPersonHandValue);
         view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue);
-        view.displayPlayerHand(data.currentPersonHand.getCards());
-        view.displayDealerHand(data.dealerHand.getCards());
+        view.setPlayerHand(data.currentPersonHand.getCards());
+        view.setDealerHand(data.dealerHand.getCards());
         
         switch (data.currentPhase) {
             case BETTING -> {
                 view.setRoundStatusLabel(data.currentPersonName + "'s Betting");
                 view.setActionTitle(data.currentPersonName + ", how much would you like to bet? $50 - $300 Max");
+                view.showDealerHand(false);
+                view.showPlayerHand(false);
                 view.showBetInput(true);
             }
             case PLAYER_TURN -> {
                 view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
-                view.setActionTitle(data.currentPersonIsBust ? "You went bust!" : data.currentPersonName + ", would you like to?");
+                view.setActionTitle(data.currentPersonName + ", would you like to?");
+                if (data.currentPersonIsBust) view.setActionTitle(data.currentPersonName + ", you went bust!");
+                if (data.currentPersonLastAction == PlayerAction.DOUBLE_DOWN) view.setActionTitle(data.currentPersonName + ", you doubled your bet to $" + data.currentPlayerBet + "!");
+                // Additional cases can be added here
+                view.showDealerHand(true);
+                view.showPlayerHand(true);
                 view.showBetInput(false);
             }
             case DEALER_TURN -> {
                 view.setRoundStatusLabel(data.currentPersonName + "'s Turn");
-                view.setActionTitle(data.currentPersonIsBust ? "data.dealerName went bust!" : data.dealerName + " stands at " + data.dealerHandValue + ".");
                 view.setActionTitle(data.dealerName + " stands at " + data.dealerHandValue + ".");
+                if (data.currentPersonIsBust) view.setActionTitle(data.dealerName + " went bust!");
+                // Additional cases can be added here
+                view.showDealerHand(false);
+                view.showPlayerHand(true);
             }
             case SETTLE -> {
                 view.setRoundStatusLabel(data.currentPersonName);
+                view.showDealerHand(true);
+                view.showPlayerHand(true);
                 switch (data.currentPlayerResult) {
                     case WIN -> {
                         view.setActionTitle(data.currentPersonName + ", you won $" + data.currentPlayerBet + "! Would you like to?");
@@ -211,9 +227,6 @@ public class GameController implements ActionListener {
                         view.showMessage(data.currentPersonName + ": Pushes $" + data.currentPlayerBet);
                     }
                 }
-            }
-            default -> {
-                view.setActionTitle("");
             }
         }
     }

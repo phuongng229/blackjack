@@ -189,20 +189,30 @@ public class GameGUI implements GameView {
         ImageIcon handsBgImage = new ImageIcon(getClass().getResource("/images/background.jpg"));
         Image handsBg = handsBgImage.getImage();
         // Creates the background panel with no forced layout (otherwise can break formatting)
-        JPanel handsWrapper = new ImageBackgroundPanel(handsBg, null);
-
+        JPanel handsWrapper = new ImageBackgroundPanel(handsBg, new GridLayout(2,1));
+        
         // Sets the layout- preserving the original layout)
-        handsWrapper.setLayout(new BoxLayout(handsWrapper, BoxLayout.Y_AXIS));
+        handsWrapper.setLayout(new GridLayout(2,1, 0, -20));
         dealerHandPanel.setOpaque(false);
         playerHandPanel.setOpaque(false);
 
         // Dealer’s hand at top
-        handsWrapper.add(dealerHandTitle);
-        handsWrapper.add(dealerHandPanel);
+        JPanel dealerHand = new JPanel();
+        dealerHand.setLayout(new BoxLayout(dealerHand, BoxLayout.Y_AXIS));
+        dealerHand.add(Box.createVerticalStrut(20));
+        dealerHand.add(dealerHandTitle);
+        dealerHand.add(dealerHandPanel);
+        dealerHand.setOpaque(false); // required
+        handsWrapper.add(dealerHand, BorderLayout.NORTH);
         
         // Player’s hand below
-        handsWrapper.add(playerHandTitle);
-        handsWrapper.add(playerHandPanel);
+        JPanel playerHand = new JPanel();
+        playerHand.setLayout(new BoxLayout(playerHand, BoxLayout.Y_AXIS));
+        playerHand.add(playerHandTitle);
+        playerHand.add(playerHandPanel);
+        //playerHand.add(Box.createVerticalStrut(30));
+        playerHand.setOpaque(false); // required
+        handsWrapper.add(playerHand, BorderLayout.CENTER);
         
         // Log Overlay
         JLayeredPane layered = new JLayeredPane();
@@ -266,7 +276,6 @@ public class GameGUI implements GameView {
         northPanel.add(northPanelRight, BorderLayout.EAST);
         
         // --- Input Panel ---
-        //JPanel inputPanel = new JPanel(new BorderLayout());
         JPanel inputPanel = new JPanel(new BorderLayout());
         JPanel inputPanelLeft = new JPanel();
         JPanel inputPanelCenter = new JPanel();
@@ -286,7 +295,7 @@ public class GameGUI implements GameView {
         playerHandTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0)); // vertical padding
         dealerHandTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         dealerHandTitle.setForeground(headerForeground);
-        dealerHandTitle.setBorder(BorderFactory.createEmptyBorder(12, 0, 16, 0)); // vertical padding
+        dealerHandTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0)); // vertical padding
         playerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         dealerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
@@ -294,7 +303,6 @@ public class GameGUI implements GameView {
         southPanel.add(inputPanel, BorderLayout.SOUTH);
         
         gamePanel.add(northPanel, BorderLayout.NORTH);
-        //gamePanel.add(handsWrapper, BorderLayout.CENTER);
         gamePanel.add(layered, BorderLayout.CENTER);
         gamePanel.add(southPanel, BorderLayout.SOUTH);
         
@@ -419,11 +427,21 @@ public class GameGUI implements GameView {
         playerHandTitle.setForeground(bust ? Color.RED : headerForeground);
     }
     @Override
-    public void displayPlayerHand(List<Card> cards) {
+    public void showPlayerHand(boolean visible) {
+        playerHandTitle.setVisible(visible);
+        playerHandPanel.setVisible(visible);
+    }
+    @Override
+    public void showDealerHand(boolean visible) {
+        dealerHandTitle.setVisible(visible);
+        dealerHandPanel.setVisible(visible);
+    }
+    @Override
+    public void setPlayerHand(List<Card> cards) {
         renderCardsInPanel(cards, playerHandPanel);
     }
     @Override
-    public void displayDealerHand(List<Card> cards) {
+    public void setDealerHand(List<Card> cards) {
         renderCardsInPanel(cards, dealerHandPanel);
     }
     // Shared helper

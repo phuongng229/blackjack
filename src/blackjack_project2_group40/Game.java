@@ -228,7 +228,7 @@ public class Game {
                 }
             }
             case PLAYER_TURN -> {
-                if (getCurrentPerson().getLastAction()==PlayerAction.STAND || getCurrentPerson().getLastAction()==PlayerAction.DOUBLE_DOWN) {
+                if (getCurrentPerson().getLastAction()==PlayerAction.STAND) {
                     // has stood so move to next person’s turn
                     currentPersonIndex++;
                     if (currentPersonIndex >= playerCount) {
