@@ -28,6 +28,7 @@ public interface GameView {
     void clearPlayerNameField();
     double getEnteredBetAmount();
     void clearBetAmountField();
+    void clearLog();
 
     // Player Setup
     void updatePlayerCount(int count);
@@ -38,6 +39,10 @@ public interface GameView {
     void setPersonBetLabel(double bet);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
+    void setPlayerHandTitle(String text);
+    void setDealerHandTitle(String text);
+    void setCurrentPersonBust(boolean bust); 
+    void setDealerBust(boolean bust);
     
     void showBetInput(boolean visible);
     

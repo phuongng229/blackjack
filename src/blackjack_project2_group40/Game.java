@@ -63,7 +63,7 @@ public class Game {
         return ScoreStore.playerHasExistingScores(name);
     }
     
-    public void setupDealer() {
+    private void setupDealer() {
         Dealer dealer = new Dealer(mainDeck, "Dealer");
         personList.add(dealer);
     }
@@ -104,22 +104,36 @@ public class Game {
         Person person = getCurrentPerson();
         GameData gameData = new GameData();
         
+        // Current Round Data
         gameData.currentRound = currentRound;
         gameData.currentPhase = phase;
         gameData.playerCount = playerCount;
-        gameData.dealerHand = dealer.getHand();
+        
+        // Current Person Data
         gameData.currentPersonHand = person.getHand();
+        gameData.currentPersonHandValue = person.getHand().getTotalValue();
         gameData.currentPersonName = person.getName();
         gameData.currentPersonAvailableActions = getAvailablePlayerActions();
+        gameData.currentPersonLastAction = person.getLastAction();
+        gameData.currentPersonIsBust = person.isBust();
+        
+        // Dealer Data
+        gameData.dealerName = dealer.getName();
+        gameData.dealerHand = dealer.getHand();
+        gameData.dealerHandValue = dealer.getHand().getTotalValue();
+        gameData.dealerIsBust = dealer.isBust();
+        
+        // Player Data
         if (person instanceof Player player) {
-            gameData.currentPersonBalance = player.getBalance();
-            gameData.currentPersonBet = player.getCurrentBet();
+            gameData.currentPlayerBalance = player.getBalance();
+            gameData.currentPlayerBet = player.getCurrentBet();
+            gameData.currentPlayerResult = GameRules.getPlayerResult(player, dealer);
         }
         return gameData;
     }
     
     // Determines PlayerAction enum values that are currently avalilable to the player
-    public List<PlayerAction> getAvailablePlayerActions() {
+    private List<PlayerAction> getAvailablePlayerActions() {
         Person currentPerson = getCurrentPerson();
         switch (phase) {
             case BETTING -> {
@@ -142,71 +156,68 @@ public class Game {
     }
     
     // Runs a single player action depending on input from GameController
-    public String performPlayerAction(PlayerAction action) {
+    public List<String> performPlayerAction(PlayerAction action) {
+        List<String> log = new ArrayList<>();
         Person person = getCurrentPerson();
         if (person instanceof Player player) {
-            StringBuilder log = new StringBuilder();
             switch (action) {
                 case HIT -> {
                     Card drawCard = player.hit();
-                    log.append(player.getName()).append(" hits and draws the ").append(drawCard).append("\n");
+                    log.add(player.getName() + ": Hits and draws the " + drawCard + ".");
                     if (player.isBust()) {
-                        log.append(player.getName()).append(" busts with ").append(player.getHand().getTotalValue()).append(".");
+                        log.add(player.getName() + ": Busts with " + player.getHand().getTotalValue() + ".");
                     }
                 }
                 case DOUBLE_DOWN -> {
                     Card drawCard = player.doubleDown();
-                    log.append(player.getName()).append(" doubles down, increasing their bet to $").append(player.getCurrentBet()).append("\n");
-                    log.append(player.getName()).append(" draws the ").append(drawCard).append("\n");
+                    log.add(player.getName() + ": Doubles down, increasing their bet to $" + player.getCurrentBet());
+                    log.add(player.getName() + ": Draws the " + drawCard);
                     if (player.isBust()) {
-                        log.append(player.getName()).append(" busts with ").append(player.getHand().getTotalValue()).append(".");
+                        log.add(player.getName() + ": Busts with " + player.getHand().getTotalValue() + ".");
                     }
                 }
                 case STAND -> {
                     player.stand();
-                    log.append(player.getName()).append(" stands at ").append(player.getHand().getTotalValue()).append(".");
+                    log.add(player.getName() + ": Stands at " + player.getHand().getTotalValue() + ".");
                 }
                 case QUIT -> {
                     // removes player from PersonList and reduces playerCount
                     personList.remove(player);
                     currentPersonIndex--; // Required to not skip a player when a player is deleted and iterating
                     playerCount--;
-                    log.append(player.getName()).append(" left the game.");
+                    log.add(player.getName() + ": Left the game.");
                 }
             }
             player.setLastAction(action);
-            return log.toString().trim();
         }
-        return "";
+        return log;
     }
     
     // Runs the dealer's turn (different logic from players)
-    public String performDealerTurn() {
-        StringBuilder log = new StringBuilder();
-        System.out.println("Dealer turn!");
+    public List<String> performDealerTurn() {
+        List<String> log = new ArrayList<>();
         Person person = getCurrentPerson();
-        System.out.println(currentPersonIndex);
         if (person instanceof Dealer dealer) {
             while (dealer.shouldHit()) {
                 Card drawCard = dealer.hit();
-                log.append(dealer.getName()).append(" hits and draws the ").append(drawCard).append("\n");
+                log.add(dealer.getName() + ": Hits and draws the " + drawCard);
                 if (dealer.isBust()) {
-                    log.append(dealer.getName()).append(" busts with ").append(dealer.getHand().getTotalValue()).append(".");
+                    log.add(dealer.getName() + ": Busts with " + dealer.getHand().getTotalValue() + ".");
                 }
             }
             if (!dealer.isBust()) {
-                log.append(dealer.getName()).append(" stands at ").append(dealer.getHand().getTotalValue()).append(".");
+                log.add(dealer.getName() + ": Stands at " + dealer.getHand().getTotalValue() + ".");
             }
+
         } else {
             throw new IllegalStateException("Current person is not the Dealer");
         }
-        return log.toString().trim();
+        return log;
     }
     
     // Moves the game forward to the next step. If all players haven't finished their turn,
     // it continues to the next player. Otherwise, continue to the next game phase (e.g. SETTLE, BETTING, etc.)
     public void advance() {
-        System.out.println("Advance");
         switch (phase) {
             case BETTING -> {
                 // Move to next person in betting phase
@@ -243,12 +254,22 @@ public class Game {
         }
     }
     
+    public void startNewGame() {
+        mainDeck.shuffleDeck();
+        setupDealer();
+        startNewRound();
+    }
+    
+    public void clearGame() {
+        personList.clear();
+        playerCount = 0;
+    }
+    
     // Reset for the next round
-    public void startNewRound() {
+    private void startNewRound() {
         phase = Phase.BETTING;
         currentPersonIndex = 0;
         currentRound++;
-
         for (Person p : personList) {
             p.clearLastAction();
             if (p instanceof Player player) {
@@ -257,7 +278,6 @@ public class Game {
         }
         checkDeck();
         dealHands();
-        System.out.println(getCurrentPerson().getHand());
     }
     
     private void checkDeck() {
@@ -267,10 +287,13 @@ public class Game {
         }
     }
     
-    // Deals two cards to each Person's hand
+    
     private void dealHands() {
         for (Person person : personList) {
+            // Moves cards to discard deck before dealing new ones.
+            person.getHand().discardHandToDeck(discardDeck); 
             person.getHand().clear();
+            // Deals two cards to each Person's hand
             for (int i = 0; i < 2; i++) {
                 person.getHand().addCard(mainDeck.drawCard());
             }
@@ -278,10 +301,34 @@ public class Game {
     }
     
     public void settleBets() {
-        
+        Dealer dealer = ((Dealer) personList.get(playerCount));
+        for (Person person : personList) {
+            if (person instanceof Player player) {
+                GameRules.Result result = GameRules.getPlayerResult(player, dealer);
+                switch (result) {
+                    case WIN -> {
+                        player.getScores().incrementWins();
+                        player.winBet();
+                    }
+                    case LOSE -> {
+                        player.getScores().incrementLosses();
+                        player.loseBet();
+                    }
+                    case PUSH -> {
+                        player.getScores().incrementPushes();
+                        player.pushBet();
+                    }
+                }
+                ScoreStore.updatePlayerScore(player.getName(), player.getScores());
+            }
+        }
     }
+}
+    
     
     /*
+    OLD CODE FOR REFERENCE - TO DELETE
+
     private final Scanner scan;
     private static int currentRound;
     private Dealer dealer;
@@ -559,5 +606,3 @@ public class Game {
         }
     }
     */
-
-}

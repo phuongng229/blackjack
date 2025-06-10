@@ -41,23 +41,26 @@ public class GameGUI implements GameView {
     private final JPanel gamePanel = new JPanel(new BorderLayout());
     
     //Components for startPanel
-    private final JTextArea log = new JTextArea(13,16);
+    private final JTextArea startLog = new JTextArea(13,16);
     private final JLabel playerCountLabel = new JLabel("Players: 0/"+GameRules.MAX_PLAYERS);
     private final JTextField nameField  = new JTextField(15);
     private final JButton joinButton  = new JButton("Join");
     private final JButton startGameButton  = new JButton("Start Game");
-    private final JButton homeButton  = new JButton("Home");
+    private final JButton homeButton  = new JButton("Exit to Menu");
     
     // Components for gamePanel
+    private final JTextArea gameLog = new JTextArea(13,16);
     private final JFormattedTextField betField;
     private final JLabel betFieldLabel = new JLabel("Amount: $");
     private final JPanel buttons = new JPanel();
     private final JLabel roundStatusLabel = new JLabel();
     private final JLabel personBalanceLabel = new JLabel();
     private final JLabel personBetLabel = new JLabel();
-    private final JLabel actionTitle = new JLabel("Would you like to?");
+    private final JLabel actionTitle = new JLabel();
     
     private final Map<String, ImageIcon> cardIconMap = new HashMap<>();
+    private final JLabel playerHandTitle = new JLabel();
+    private final JLabel dealerHandTitle = new JLabel();
     private final JPanel playerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
     private final JPanel dealerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
     
@@ -133,13 +136,18 @@ public class GameGUI implements GameView {
         JScrollPane rulesScroll = new JScrollPane(rulesArea);
         rulesScroll.setBorder(BorderFactory.createTitledBorder("Rules"));
         rulesArea.setOpaque(false);
+        rulesArea.setEditable(false);
+        rulesArea.setFocusable(false);
+        rulesArea.getCaret().setVisible(false);
         centerPanel.add(rulesScroll);
         
         // --- Log panel (right) ---
-        log.setEditable(false);
-        log.setLineWrap(true);
-        log.setWrapStyleWord(true);
-        centerPanel.add(new JScrollPane(log));
+        startLog.setEditable(false);
+        startLog.setFocusable(false);
+        startLog.getCaret().setVisible(false);
+        startLog.setLineWrap(true);
+        startLog.setWrapStyleWord(true);
+        centerPanel.add(new JScrollPane(startLog));
         
         startPanel.add(centerPanel, BorderLayout.CENTER);
         
@@ -189,13 +197,11 @@ public class GameGUI implements GameView {
         playerHandPanel.setOpaque(false);
 
         // Dealer’s hand at top
-        JLabel dealerLabel = new JLabel("Dealer’s Hand");
-        handsWrapper.add(dealerLabel);
+        handsWrapper.add(dealerHandTitle);
         handsWrapper.add(dealerHandPanel);
         
         // Player’s hand below
-        JLabel playerLabel = new JLabel("Your Hand");
-        handsWrapper.add(playerLabel);
+        handsWrapper.add(playerHandTitle);
         handsWrapper.add(playerHandPanel);
         
         // Log Overlay
@@ -206,23 +212,23 @@ public class GameGUI implements GameView {
         JPanel overlay = new JPanel(new BorderLayout());
         overlay.setOpaque(false);
         
-        log.setEditable(false);
-        log.setFocusable(false);
-        log.getCaret().setVisible(false);
-        log.setLineWrap(true);
-        log.setWrapStyleWord(true);
-        log.setOpaque(false);
-        log.setForeground(headerForeground);
-        log.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6)); // inner padding
-        JScrollPane logScrollPane = new JScrollPane(log);
-        logScrollPane.setBorder(null);
-        logScrollPane.setOpaque(false);
-        JViewport vp = logScrollPane.getViewport();
+        gameLog.setEditable(false);
+        gameLog.setFocusable(false);
+        gameLog.getCaret().setVisible(false);
+        gameLog.setLineWrap(true);
+        gameLog.setWrapStyleWord(true);
+        gameLog.setOpaque(false);
+        gameLog.setForeground(headerForeground);
+        gameLog.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6)); // inner padding
+        JScrollPane gameLogScrollPane = new JScrollPane(gameLog);
+        gameLogScrollPane.setBorder(null);
+        gameLogScrollPane.setOpaque(false);
+        JViewport vp = gameLogScrollPane.getViewport();
         vp.setBackground(new Color(0, 0, 0, 100));
         
         JPanel overlayContentWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         overlayContentWrapper.setOpaque(false);
-        overlayContentWrapper.add(logScrollPane);
+        overlayContentWrapper.add(gameLogScrollPane);
         overlay.add(overlayContentWrapper, BorderLayout.NORTH);
         overlay.setAlignmentX(0.5f);
         overlay.setAlignmentY(0.5f);
@@ -240,7 +246,7 @@ public class GameGUI implements GameView {
         northPanel.setBackground(headerBackground);
         
         actionTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        actionTitle.setFont(new Font("Arial", Font.PLAIN, 16));
+        actionTitle.setFont(new Font("Arial", Font.PLAIN, 14));
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
         
         JPanel northPanelLeft = new JPanel(new BorderLayout());
@@ -275,10 +281,14 @@ public class GameGUI implements GameView {
         inputPanelCenter.add(betField);
         inputPanelCenter.add(buttons);
         
-        dealerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        dealerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        playerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerHandTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerHandTitle.setForeground(headerForeground);
+        playerHandTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0)); // vertical padding
+        dealerHandTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dealerHandTitle.setForeground(headerForeground);
+        dealerHandTitle.setBorder(BorderFactory.createEmptyBorder(12, 0, 16, 0)); // vertical padding
         playerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dealerHandPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         southPanel.add(actionTitle, BorderLayout.CENTER);
         southPanel.add(inputPanel, BorderLayout.SOUTH);
@@ -303,7 +313,13 @@ public class GameGUI implements GameView {
 
     @Override
     public void showMessage(String message) {
-        log.append(message + "\n");
+        startLog.append(message + "\n");
+        gameLog.append(message + "\n");
+    }
+    @Override
+    public void clearLog() {
+        startLog.setText("");
+        gameLog.setText("");
     }
     @Override
     public boolean promptYesNo(String message) {
@@ -385,6 +401,22 @@ public class GameGUI implements GameView {
     @Override
     public void setActionTitle(String text) {
         actionTitle.setText(text);
+    }
+    @Override
+    public void setPlayerHandTitle(String text) {
+        playerHandTitle.setText(text);
+    }
+    @Override
+    public void setDealerHandTitle(String text) {
+        dealerHandTitle.setText(text);
+    }
+    @Override
+    public void setCurrentPersonBust(boolean bust) {
+        playerHandTitle.setForeground(bust ? Color.RED : headerForeground);
+    }
+    @Override
+    public void setDealerBust(boolean bust) {
+        playerHandTitle.setForeground(bust ? Color.RED : headerForeground);
     }
     @Override
     public void displayPlayerHand(List<Card> cards) {

@@ -70,16 +70,15 @@ public class Player extends Person implements Bettor {
     @Override
     public void winBet() {
         balance += currentBet * 2;
-        currentBet = 0;
     }
     @Override
     public void pushBet() {
         balance += currentBet;
-        currentBet = 0;
     }
     @Override
     public void loseBet() {
-        currentBet = 0;
+        // Bet is lost, do nothing
+        // currentBet is cleared on round start
     }
     
     

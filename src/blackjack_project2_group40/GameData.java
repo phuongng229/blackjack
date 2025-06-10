@@ -17,12 +17,24 @@ public class GameData {
     public int currentRound;
     public Game.Phase currentPhase;
     public int playerCount;
-    public Hand dealerHand;
     
     // Current Person Data
-    public Hand currentPersonHand;
     public String currentPersonName;
+    public Hand currentPersonHand;
+    public int currentPersonHandValue;
     public List<PlayerAction> currentPersonAvailableActions;
-    public double currentPersonBalance;
-    public double currentPersonBet;
+    public PlayerAction currentPersonLastAction;
+    public boolean currentPersonIsBust;
+    
+    // Dealer Data
+    public String dealerName;
+    public Hand dealerHand;
+    public int dealerHandValue;
+    public boolean dealerIsBust;
+    
+    // Player Data
+    public double currentPlayerBalance;
+    public double currentPlayerBet;
+    public GameRules.Result currentPlayerResult;
+    
 }

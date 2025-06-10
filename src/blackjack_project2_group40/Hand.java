@@ -30,9 +30,9 @@ public class Hand {
     }
 
     //Discard hand to Deck
-    public void discardHandToDeck(Deck discardCard) {
-        discardCard.addAllCards(cards);
-        cards.clear();
+    public void discardHandToDeck(Deck deck) {
+        deck.addAllCards(cards);
+        this.clear();
     }
 
     //Add a card to the hand

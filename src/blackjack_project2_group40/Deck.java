@@ -63,7 +63,6 @@ public class Deck {
         this.addAllCards(discardDeck.getCards());
         this.shuffleDeck();
         discardDeck.emptyDeck();
-        System.out.println("Main deck will be reloaded from discard deck and shuffled it!");
     }
     
     public void emptyDeck() {
