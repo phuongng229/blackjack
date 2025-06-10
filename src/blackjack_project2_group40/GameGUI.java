@@ -411,20 +411,14 @@ public class GameGUI implements GameView {
         actionTitle.setText(text);
     }
     @Override
-    public void setPlayerHandTitle(String text) {
+    public void setPlayerHandTitle(String text, boolean isBust) {
         playerHandTitle.setText(text);
+        playerHandTitle.setForeground(isBust ? Color.RED : headerForeground);
     }
     @Override
-    public void setDealerHandTitle(String text) {
+    public void setDealerHandTitle(String text, boolean isBust) {
         dealerHandTitle.setText(text);
-    }
-    @Override
-    public void setCurrentPersonBust(boolean bust) {
-        playerHandTitle.setForeground(bust ? Color.RED : headerForeground);
-    }
-    @Override
-    public void setDealerBust(boolean bust) {
-        playerHandTitle.setForeground(bust ? Color.RED : headerForeground);
+        dealerHandTitle.setForeground(isBust ? Color.RED : headerForeground);
     }
     @Override
     public void showPlayerHand(boolean visible) {

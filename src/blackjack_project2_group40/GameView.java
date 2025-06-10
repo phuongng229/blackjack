@@ -39,10 +39,8 @@ public interface GameView {
     void setPersonBetLabel(double bet);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
-    void setPlayerHandTitle(String text);
-    void setDealerHandTitle(String text);
-    void setCurrentPersonBust(boolean bust); 
-    void setDealerBust(boolean bust);
+    void setPlayerHandTitle(String text, boolean isBust);
+    void setDealerHandTitle(String text, boolean isBust);
     void setPlayerHand(List<Card> cards);
     void setDealerHand(List<Card> cards);
     

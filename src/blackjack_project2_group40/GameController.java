@@ -174,11 +174,10 @@ public class GameController implements ActionListener {
         view.setPersonBalanceLabel(data.currentPlayerBalance);
         view.setPersonBetLabel(data.currentPlayerBet);
         view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
-        view.setDealerBust(data.dealerIsBust);
-        view.setCurrentPersonBust(data.currentPersonIsBust);
-        view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue);
-        view.setPlayerHandTitle(data.currentPersonName + "'s Hand Value: " + data.currentPersonHandValue);
-        view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue);
+        //view.setDealerBust(data.dealerIsBust);
+        //view.setCurrentPersonBust(data.currentPersonIsBust);
+        view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue, data.dealerIsBust);
+        view.setPlayerHandTitle(data.currentPersonName + "'s Hand Value: " + data.currentPersonHandValue, data.currentPersonIsBust);
         view.setPlayerHand(data.currentPersonHand.getCards());
         view.setDealerHand(data.dealerHand.getCards());
         
