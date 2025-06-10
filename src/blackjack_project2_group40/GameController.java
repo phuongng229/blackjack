@@ -44,49 +44,48 @@ public class GameController implements ActionListener {
         switch (command) {
             case "JOIN" -> {
                 handlePlayerJoin();
-                return;
             }
             case "START" -> {
                 handleGameStart();
-                return;
             }
             case "HOME" -> {
                 handleGameQuit();
-                return;
             }
             case "NEXT_ROUND" -> { // The continue to next round player action button was clicked
                 handleNextRound();
-                return;
             }
             case "PLACE_BET" -> {
                 handleBetPlaced();
-                return;
             }
             case "DEALER_CONTINUE" -> {
                 model.advance();
                 model.settleBets();
                 refreshView();
-                return;
             }
-            case "HIT", "DOUBLE_DOWN", "STAND", "QUIT" -> {
-                try {
-                    if(model.getPlayerCount() < 2) { // Exits to menu if last player chooses to quit
-                        handleGameQuit();
-                        return;
-                    }
-                    PlayerAction action = PlayerAction.valueOf(command);
-                    List<String> logs = model.performPlayerAction(action);
-                    logs.forEach(log -> view.showMessage(log));
-                    model.advance();
-                    refreshView();
-                } catch (IllegalArgumentException ex) {
-                    view.showMessage("Invalid action: " + command);
+            case  "QUIT" -> {
+                if(model.getPlayerCount() < 2) { // Exits to menu if last player chooses to quit
+                    handleGameQuit();
+                } else {
+                    handlePlayerStandardAction(command);
                 }
-                return;
+            }
+            case "HIT", "DOUBLE_DOWN", "STAND" -> {
+                handlePlayerStandardAction(command);
             }
             default -> {
                 view.showMessage("Unrecognized command: " + command);
             }
+        }
+    }
+    public void handlePlayerStandardAction(String command) {
+        try {
+            PlayerAction action = PlayerAction.valueOf(command);
+            List<String> logs = model.performPlayerAction(action);
+            logs.forEach(log -> view.showMessage(log));
+            model.advance();
+            refreshView();
+        } catch (IllegalArgumentException ex) {
+            view.showMessage("Invalid action: " + command);
         }
     }
     
