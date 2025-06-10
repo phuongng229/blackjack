@@ -35,8 +35,8 @@ public interface GameView {
 
     // Game Phase
     void setRoundStatusLabel(String text);
-    void setPersonBalanceLabel(double balance);
-    void setPersonBetLabel(double bet);
+    void setPersonBalanceLabel(String text);
+    void setPersonBetLabel(String text);
     void setActionTitle(String text);
     void setActionButtons(List<PlayerAction> actions, ActionListener listener);
     void setPlayerHandTitle(String text, boolean isBust);

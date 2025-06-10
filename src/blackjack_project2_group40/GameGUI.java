@@ -399,12 +399,12 @@ public class GameGUI implements GameView {
         roundStatusLabel.setText(text);
     }
     @Override
-    public void setPersonBalanceLabel(double balance) {
-        personBalanceLabel.setText("Balance: $" + balance);
+    public void setPersonBalanceLabel(String text) {
+        personBalanceLabel.setText(text);
     }
     @Override
-    public void setPersonBetLabel(double bet) {
-        personBetLabel.setText("Your Bet: $" + bet);
+    public void setPersonBetLabel(String text) {
+        personBetLabel.setText(text);
     }
     @Override
     public void setActionTitle(String text) {

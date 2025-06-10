@@ -171,11 +171,9 @@ public class GameController implements ActionListener {
     }
     
     private void updateUI(GameData data) { // Update GUI with GameData       
-        view.setPersonBalanceLabel(data.currentPlayerBalance);
-        view.setPersonBetLabel(data.currentPlayerBet);
+        view.setPersonBalanceLabel("Balance: $" + data.currentPlayerBalance);
+        view.setPersonBetLabel("Your Bet: $" + data.currentPlayerBet);
         view.setActionButtons(data.currentPersonAvailableActions, this); // update action buttons
-        //view.setDealerBust(data.dealerIsBust);
-        //view.setCurrentPersonBust(data.currentPersonIsBust);
         view.setDealerHandTitle(data.dealerName + "'s Hand Value: " + data.dealerHandValue, data.dealerIsBust);
         view.setPlayerHandTitle(data.currentPersonName + "'s Hand Value: " + data.currentPersonHandValue, data.currentPersonIsBust);
         view.setPlayerHand(data.currentPersonHand.getCards());
@@ -206,6 +204,9 @@ public class GameController implements ActionListener {
                 // Additional cases can be added here
                 view.showDealerHand(false);
                 view.showPlayerHand(true);
+                // Removes bet and balance info for dealer
+                view.setPersonBalanceLabel("");
+                view.setPersonBetLabel("");
             }
             case SETTLE -> {
                 view.setRoundStatusLabel(data.currentPersonName);
