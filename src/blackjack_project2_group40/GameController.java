@@ -90,24 +90,60 @@ public class GameController implements ActionListener {
     }
     
     // Used by the "Join" command to handle players joining
+//    private void handlePlayerJoin() {
+//        String name = view.getEnteredPlayerName();
+//        if (model.playerNameIsTaken(name)) {
+//            showNameTakenMessage(name);
+//            return;
+//        }
+//        PlayerScores scores = model.getPlayerScores(name);
+//        if (model.playerHasExistingScores(name)) {
+//            boolean isCorrectPlayer = view.promptYesNo("A player with that name already exists with the following scores. Is this you?\n" + scores);
+//            if (!isCorrectPlayer) {
+//                showNameTakenMessage(name);
+//                return;
+//            }
+//        }
+//        model.addPlayer(name, scores);
+//        view.showMessage("Player \"" + name + "\" has joined.");
+//        view.clearPlayerNameField();
+//        view.updatePlayerCount(model.getPlayerCount());
+//    }
+    
     private void handlePlayerJoin() {
         String name = view.getEnteredPlayerName();
-        if (model.playerNameIsTaken(name)) {
-            showNameTakenMessage(name);
-            return;
-        }
-        PlayerScores scores = model.getPlayerScores(name);
-        if (model.playerHasExistingScores(name)) {
-            boolean isCorrectPlayer = view.promptYesNo("A player with that name already exists with the following scores. Is this you?\n" + scores);
-            if (!isCorrectPlayer) {
-                showNameTakenMessage(name);
+        
+        //Check if the player already exists in the database
+        if (ScoreStore.playerHasExistingScores(name)) {
+            //Load their existing scores
+            PlayerScores scores = ScoreStore.getPlayerScores(name);
+            
+            //Ask if this is the same player
+            boolean isSamePlayer = view.promptYesNo("A player with that name already exists with the following scores. Is this you?\n" + scores);
+            if (!isSamePlayer) {
+                showNameTakenMess(name);
                 return;
             }
+            
+            //Add the player with existing scores
+            model.addPlayer(name, scores);
+            view.showMessage("Player \"" + name + "\" has joined.");
+        } else {
+            //If it's a new player, create new PlayerScore object and insert that player into the database
+            PlayerScores newPlayer = new PlayerScores();
+            ScoreStore.insertPlayer(name, newPlayer);
+            
+            //Add the new player to the game
+            model.addPlayer(name, newPlayer);
+            view.showMessage("New player \"" + name + "\" has joined.");
         }
-        model.addPlayer(name, scores);
-        view.showMessage("Player \"" + name + "\" has joined.");
+        //Clear the name field and update the player count on the view
         view.clearPlayerNameField();
         view.updatePlayerCount(model.getPlayerCount());
+    }
+    
+    private void showNameTakenMess(String name) {
+        view.showMessage("Sorry, " + name + " is already taken. Please enter a different name.");
     }
     
     private void showNameTakenMessage(String name) { // Used by the handlePlayerJoin() method

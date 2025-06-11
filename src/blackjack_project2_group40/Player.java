@@ -23,7 +23,7 @@ public class Player extends Person implements Bettor {
     public Player(Deck deck, String name, PlayerScores scores) {
         super(deck, name);
         setScores(scores);
-        this.balance = INITIAL_BALANCE;
+        this.balance = scores.getBalance();
         this.currentBet = 0;
     }
     
@@ -89,7 +89,7 @@ public class Player extends Person implements Bettor {
         if (handResults.canHit && getLastAction()!= PlayerAction.DOUBLE_DOWN) availableActions.add(PlayerAction.HIT);
         if (handResults.canStand) availableActions.add(PlayerAction.STAND);
         // Additional check for whether doubling down would cause bet to exceed max/min betting range or player balance.
-        if (handResults.canDoubleDown && canPlaceBet(currentBet*2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
+        if (handResults.canDoubleDown && getBalance() >= (currentBet * 2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
 
         return availableActions;
     }

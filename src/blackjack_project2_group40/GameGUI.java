@@ -382,6 +382,9 @@ public class GameGUI implements GameView {
         betFieldLabel.setVisible(visible);
         betField.setVisible(visible);
     }
+    public JFrame getFrame() {
+        return frame;
+    }
     @Override
     public double getEnteredBetAmount() {
         Object value = betField.getValue();

@@ -96,6 +96,7 @@ public class Game {
         Person person = getCurrentPerson();
         if (person instanceof Player player) {
             player.placeBet(amount);
+            ScoreStore.updatePlayerBalance(player.getName(), player.getBalance());
         }
     }
     
@@ -319,7 +320,11 @@ public class Game {
                         player.pushBet();
                     }
                 }
-                ScoreStore.updatePlayerScore(player.getName(), player.getScores());
+                //Update the player's scores and balance in the database
+                if (player.getLastAction() != PlayerAction.QUIT) {
+                    ScoreStore.updatePlayerScore(player.getName(), player.getScores());
+                    ScoreStore.updatePlayerBalance(player.getName(), player.getBalance());
+                }
             }
         }
     }
