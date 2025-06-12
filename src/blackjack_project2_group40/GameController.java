@@ -89,7 +89,7 @@ public class GameController implements ActionListener {
         }
     }
     
-    // Used by the "Join" command to handle players joining
+    
 //    private void handlePlayerJoin() {
 //        String name = view.getEnteredPlayerName();
 //        if (model.playerNameIsTaken(name)) {
@@ -110,6 +110,7 @@ public class GameController implements ActionListener {
 //        view.updatePlayerCount(model.getPlayerCount());
 //    }
     
+    // Used by the "Join" command to handle players joining
     private void handlePlayerJoin() {
         String name = view.getEnteredPlayerName();
         
@@ -143,10 +144,6 @@ public class GameController implements ActionListener {
     }
     
     private void showNameTakenMess(String name) {
-        view.showMessage("Sorry, " + name + " is already taken. Please enter a different name.");
-    }
-    
-    private void showNameTakenMessage(String name) { // Used by the handlePlayerJoin() method
         view.showMessage("Sorry, " + name + " is already taken. Please enter a different name.");
     }
     
