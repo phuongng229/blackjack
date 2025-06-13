@@ -187,7 +187,7 @@ public class GameGUI implements GameView {
         detailsPanel.add(personBalanceLabel);
 
         // Loads the background image for the handsWrapper
-        Image handsBgImage = new ImageIcon("./resources/background.jpg").getImage();
+        Image handsBgImage = new ImageIcon("./resources/images/background.jpg").getImage();
         // Creates the background panel with no forced layout (otherwise can break formatting)
         JPanel handsWrapper = new ImageBackgroundPanel(handsBgImage, new GridLayout(2,1));
         

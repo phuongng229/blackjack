@@ -9,7 +9,7 @@ import java.sql.*;
  * @author phuong
  */
 public class DBManager {
-    private static final String DB_URL = "jdbc:derby:/Users/fuong/Documents/AUT/2ND YEAR/SEMESTER_1/PROGRAM_DESIGN_AND_CONSTRUCTION/PROJECT_2/blackjack/db/BlackjackDB;create=true";
+    private static final String DB_URL = "jdbc:derby:db/BlackjackDB;create=true";
     private static Connection conn;
 
     // Establish connection

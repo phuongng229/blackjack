@@ -44,7 +44,7 @@ public class Main {
                 System.out.println("Error shutting down Derby: " + e.getMessage());
             }
         }
-        System.exit(0);
+//        System.exit(0);
     }
 
 }
