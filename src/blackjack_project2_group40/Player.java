@@ -84,13 +84,24 @@ public class Player extends Person implements Bettor {
     
     public List<PlayerAction> getAvailableActions() {
         List<PlayerAction> availableActions = new ArrayList<>();
-        HandCheck handResults = getHandResults();
-        // Additional check for whether the player has doubled down, in which case their only available action is now to stand.
-        if (handResults.canHit && getLastAction()!= PlayerAction.DOUBLE_DOWN) availableActions.add(PlayerAction.HIT);
-        if (handResults.canStand) availableActions.add(PlayerAction.STAND);
-        // Additional check for whether doubling down would cause bet to exceed max/min betting range or player balance.
-        if (handResults.canDoubleDown && getBalance() >= (currentBet * 2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
+        
+        //If the player has a natural Blackjack (21 with 2 cards), they should have only option Stand
+        if (getHand().getCards().size() == 2 && getHand().getTotalValue() == 21) {
+            availableActions.add(PlayerAction.STAND);
+        } 
+        //If the player has hit and the hand value is 21, should only be able to Stand
+        else if (getHand().getTotalValue() == 21) {
+            availableActions.add(PlayerAction.STAND);
+        } else {
+            HandCheck handResults = getHandResults();
+            // Additional check for whether the player has doubled down, in which case their only available action is now to stand.
+            if (handResults.canHit && getLastAction()!= PlayerAction.DOUBLE_DOWN) availableActions.add(PlayerAction.HIT);
+            if (handResults.canStand) availableActions.add(PlayerAction.STAND);
+            // Additional check for whether doubling down would cause bet to exceed max/min betting range or player balance.
+            if (handResults.canDoubleDown && getBalance() >= (currentBet * 2)) availableActions.add(PlayerAction.DOUBLE_DOWN);
 
+        }
+        
         return availableActions;
     }
     

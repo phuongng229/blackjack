@@ -96,7 +96,6 @@ public class Game {
         Person person = getCurrentPerson();
         if (person instanceof Player player) {
             player.placeBet(amount);
-            ScoreStore.updatePlayerBalance(player.getName(), player.getBalance());
         }
     }
     
