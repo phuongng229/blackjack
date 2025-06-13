@@ -7,6 +7,7 @@ package blackjack_project2_group40;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -100,12 +101,12 @@ public class GameGUI implements GameView {
         for (Suit suit : Suit.values()) {
             for (Face face : Face.values()) {
                 String code = face.getCode() +"-"+ suit.getCode();  // e.g. "A-S"
-                String path = "/images/cards/" + code + ".png";
-                java.net.URL imgURL = getClass().getResource(path);
-                if (imgURL != null) {
-                    cardIconMap.put(code, new ImageIcon(imgURL));
+                String path = "./resources/images/cards/" + code + ".png";
+                File imgFile = new File(path);
+                if (imgFile.exists()) {
+                    cardIconMap.put(code, new ImageIcon(imgFile.getAbsolutePath()));
                 } else {
-                    System.err.println("Missing image: " + path);
+                    System.err.println("Missing image file: " + path);
                 }
             }
         }
@@ -186,10 +187,9 @@ public class GameGUI implements GameView {
         detailsPanel.add(personBalanceLabel);
 
         // Loads the background image for the handsWrapper
-        ImageIcon handsBgImage = new ImageIcon(getClass().getResource("/images/background.jpg"));
-        Image handsBg = handsBgImage.getImage();
+        Image handsBgImage = new ImageIcon("./resources/T06_bg.jpg").getImage();
         // Creates the background panel with no forced layout (otherwise can break formatting)
-        JPanel handsWrapper = new ImageBackgroundPanel(handsBg, new GridLayout(2,1));
+        JPanel handsWrapper = new ImageBackgroundPanel(handsBgImage, new GridLayout(2,1));
         
         // Sets the layout- preserving the original layout)
         handsWrapper.setLayout(new GridLayout(2,1, 0, -20));
