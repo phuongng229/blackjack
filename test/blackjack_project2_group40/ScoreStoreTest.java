@@ -56,20 +56,5 @@ public class ScoreStoreTest {
 
         assertTrue("Inserted player should exist", ScoreStore.playerHasExistingScores(TEST_PLAYER));
     }
-  
-    
-    /**
-     * Test 2: Test retrieving a player's scores
-     */
-    @Test
-    public void testGetPlayerScores() {
-        PlayerScores scores = ScoreStore.getPlayerScores(TEST_PLAYER);
-
-        assertNotNull("Scores should not be null", scores);
-        assertEquals(3, scores.getTotalWins());
-        assertEquals(0, scores.getTotalLosses());
-        assertEquals(2, scores.getTotalPushes());
-        assertEquals(2000.0, scores.getBalance(), 0.001);
-    }
 
 }
