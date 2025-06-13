@@ -66,7 +66,7 @@ public class DBManager {
         }
     }
 
-    // Insert players into the database using data from ScoreStore class
+    // Insert players into the database using data from ScoreStore class (Database WRITE Interactions)
     public static void insertPlayer(String name, PlayerScores scores) {
         try {
             
@@ -85,7 +85,7 @@ public class DBManager {
         }
     }
 
-    // Update an existing player's scores in the database
+    // Update an existing player's scores in the database (Database WRITE Interactions)
     public static void updatePlayerScore(String name, PlayerScores scores) {
         try {
             
@@ -104,7 +104,7 @@ public class DBManager {
         }
     }
 
-    // Retrieve a player's scores from the database
+    // Retrieve a player's scores from the database (Database READ Interactions)
     public static PlayerScores getPlayerScores(String name) {
         PlayerScores scores = null;
         try {
@@ -128,7 +128,7 @@ public class DBManager {
         return scores;
     }
     
-    // Check if a player exists in the database
+    // Check if a player exists in the database (Database READ Interactions)
     public static boolean playerExists(String name) {
         boolean exists = false;
         try {
@@ -147,7 +147,7 @@ public class DBManager {
         return exists;
     }
     
-    //Update the player's balance in the database
+    //Update the player's balance in the database (Database WRITE Interactions)
     public static void updatePlayerBalance(String name, double balance) {
         try {
             PreparedStatement ps = getConnection().prepareStatement(

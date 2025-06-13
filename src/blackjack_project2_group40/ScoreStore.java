@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class ScoreStore {
 
-    //Load scores from the database
+    //Load scores from the database (Database READ Interactions)
     private static Map<String, PlayerScores> loadScores() {
         Map<String, PlayerScores> scoreInMap = new HashMap<>();
         
