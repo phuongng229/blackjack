@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author fuong
+ * @author phuong
  */
 public class PlayerTest {
     
