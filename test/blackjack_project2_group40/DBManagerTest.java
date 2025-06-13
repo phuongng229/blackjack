@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author fuong
+ * @author phuong
  */
 public class DBManagerTest {
     
