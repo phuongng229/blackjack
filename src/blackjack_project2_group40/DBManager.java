@@ -45,22 +45,21 @@ public class DBManager {
             Connection conn = DBManager.getConnection();
             Statement statement = conn.createStatement();
 
-            // Drop the table if it exists
-            try {
-                statement.executeUpdate("DROP TABLE PLAYERS");
-            } catch (SQLException e) {
-                System.out.println("PLAYERS table did not exist");
+            // Create only if it doesn't exist
+            try (ResultSet rs = conn.getMetaData().getTables(null, null, "PLAYERS", null)) {
+                if (!rs.next()) {
+                    String createTable = "CREATE TABLE PLAYERS (" +
+                            "NAME VARCHAR(50), " +
+                            "WINS INT, " +
+                            "LOSSES INT, " +
+                            "PUSHES INT, " +
+                            "BALANCE DOUBLE)";
+                    statement.executeUpdate(createTable);
+                    System.out.println("Created PLAYERS table");
+                } else {
+                    System.out.println("PLAYERS table already exists");
+                }
             }
-
-            // Create new PLAYERS table
-            String createTable = "CREATE TABLE PLAYERS (" +
-                    "NAME VARCHAR(50), " +
-                    "WINS INT, " +
-                    "LOSSES INT, " +
-                    "PUSHES INT, " +
-                    "BALANCE DOUBLE)";
-            statement.executeUpdate(createTable);
-            System.out.println("Created PLAYERS table");
         } catch (SQLException e) {
             System.out.println("Error setting up PLAYERS table: " + e.getMessage());
         }

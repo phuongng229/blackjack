@@ -20,6 +20,9 @@ public class Main {
             Game model = new Game(); // Instantiate the game model
             GameGUI view = new GameGUI(); // Instantiate the view; its constructor builds all the JFrames, JPanels, etc.
             new GameController(model, view); // Wire them together via controller
+            
+            //Create table if it doesn't exist
+            DBManager.createPlayerTable();
 
             //Ensure the Derby is shut down when the application closes
             view.getFrame().addWindowListener(new java.awt.event.WindowAdapter() {
