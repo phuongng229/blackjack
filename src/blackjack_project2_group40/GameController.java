@@ -89,32 +89,14 @@ public class GameController implements ActionListener {
         }
     }
     
-    /*
-    private void handlePlayerJoin() {
-        String name = view.getEnteredPlayerName();
-        if (model.playerNameIsTaken(name)) {
-            showNameTakenMessage(name);
-            return;
-        }
-        PlayerScores scores = model.getPlayerScores(name);
-        if (model.playerHasExistingScores(name)) {
-            boolean isCorrectPlayer = view.promptYesNo("A player with that name already exists with the following scores. Is this you?\n" + scores);
-            if (!isCorrectPlayer) {
-                showNameTakenMessage(name);
-                return;
-            }
-        }
-        model.addPlayer(name, scores);
-        view.showMessage("Player \"" + name + "\" has joined.");
-        view.clearPlayerNameField();
-        view.updatePlayerCount(model.getPlayerCount());
-    }
-    */
-
     // Used by the "Join" command to handle players joining
     private void handlePlayerJoin() {
         String name = view.getEnteredPlayerName();
-        
+        // A player with this name has already joined the current game
+        if (model.playerNameIsTaken(name)) {
+            showNameTakenMess(name);
+            return;
+        }
         //Check if the player already exists in the database
         if (ScoreStore.playerHasExistingScores(name)) {
             //Load their existing scores
